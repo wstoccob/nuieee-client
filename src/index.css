@@ -14,6 +14,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --color-ieee-blue: #00629C;
 }
 
 body {
@@ -49,5 +51,11 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+@layer utilities {
+  .text-ieee-blue {
+    color: var(--color-ieee-blue);
   }
 }
