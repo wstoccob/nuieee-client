@@ -8,7 +8,7 @@
 
 export const BigTextSection = () => {
     return (
-        <section className="bg-black text-white px-4 py-8 md:px-12">
+        <section className="bg-black text-white px-4 py-8 md:px-12 mb-8">
             <div className="max-w-screen-xl mx-auto">
                 {bigWords.map((word, idx) => (
                     <h2
