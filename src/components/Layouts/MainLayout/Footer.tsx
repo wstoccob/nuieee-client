@@ -1,11 +1,11 @@
 ﻿import { Link } from "react-router-dom"
-import linkedinIcon from '../../../assets/linkedin_icon.svg';
-import youtubeIcon from '../../../assets/youtube_icon.svg';
-import facebookIcon from '../../../assets/facebook_icon.svg';
-import instagramIcon from '../../../assets/instagram_icon.svg';
-import tiktokIcon from '../../../assets/tiktok_icon.svg';
-import telegramIcon from '../../../assets/telegram_icon.svg';
-import ieeeLogo from '../../../assets/ieee_logo.svg';
+import linkedinIcon from '../../../assets/icons/linkedin_icon.svg';
+import youtubeIcon from '../../../assets/icons/youtube_icon.svg';
+import facebookIcon from '../../../assets/icons/facebook_icon.svg';
+import instagramIcon from '../../../assets/icons/instagram_icon.svg';
+import tiktokIcon from '../../../assets/icons/tiktok_icon.svg';
+import telegramIcon from '../../../assets/icons/telegram_icon.svg';
+import ieeeLogo from '../../../assets/icons/ieee_logo.svg';
 
 export default function Component() {
     return (

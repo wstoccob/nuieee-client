@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
-import ieeeSmallBlueIcon from '../../assets/ieee_small_blue_icon.svg';
+import ieeeSmallBlueIcon from '../../assets/icons/ieee_small_blue_icon.svg';
 import type { EventHomePageDto } from '../../dtos/HomePage/EventHomePageDto.ts';
 
 export const EventCard: React.FC<EventHomePageDto> = ({ title, date, location, link }) => {

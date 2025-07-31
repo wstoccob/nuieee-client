@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 :root {
   font-family: 'Inter', sans-serif;
   line-height: 1.5;
@@ -58,4 +57,18 @@ button:focus-visible {
   .text-ieee-blue {
     color: var(--color-ieee-blue);
   }
+  .bg-ieee-blue {
+    background-color: var(--color-ieee-blue);
+  }
+}
+
+.slick-slide {
+  opacity: 0.4;
+  transform: scale(0.9);
+  transition: all 0.3s ease-in-out;
+}
+
+.slick-center {
+  opacity: 1 !important;
+  transform: scale(1.05);
 }

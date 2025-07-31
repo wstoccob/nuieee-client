@@ -4,6 +4,7 @@ import {BigTextSection} from "../components/HomePage/BigTextSection.tsx";
 import {AnnouncementTicker} from "../components/HomePage/AnnouncementTicker.tsx";
 import {AboutUsSection} from "../components/HomePage/AboutUsSection.tsx";
 import {EventsSection} from "../components/HomePage/EventsSection.tsx";
+import BoardMembersSection from "../components/HomePage/BoardMembersSection.tsx";
 
 export default function HomePage() {
     return (
@@ -14,6 +15,7 @@ export default function HomePage() {
                 <AnnouncementTicker />
                 <AboutUsSection />
                 <EventsSection />
+                <BoardMembersSection />
             </main>
         </MainLayout>
     );

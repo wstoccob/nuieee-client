@@ -1,6 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
-import ieeeIcon from '../../../assets/ieee_icon.svg';
-import webIcon from '../../../assets/web_icon.svg';
+import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
+import webIcon from '../../../assets/icons/web_icon.svg';
 
 const navLinks = [
     { label: 'HACKATHON 2.0', to: '/hackathon' },
