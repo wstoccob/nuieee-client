@@ -1,35 +1,37 @@
-﻿export const HeroSection = () => {
+﻿import ieeeHeroSection from '../../assets/icons/IEEE_mainscreen.svg';
+
+export function HeroSection() {
     return (
-        <section className="relative min-h-[200px] h-auto bg-black text-white overflow-hidden mb-8">
-            {/* Content */}
-            <div className="relative z-10 container mx-auto px-4 py-20 h-[600px]">
-                <div className="max-w-4xl">
-                    {/* IEEE Logo/Title */}
-                    <h1 className="text-[clamp(120px,15vw,200px)] font-inter font-extrabold leading-none tracking-tight mb-8">
-                        IEEE
-                    </h1>
+        <section className="relative w-full min-h-screen bg-black overflow-hidden">
+            {/* Background blur effect */}
+            <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-[1165px] h-[662px] bg-blue-500/25 blur-[125px]"></div>
+            </div>
 
-                    {/* Student Branch Info */}
-                    <div className="mb-8">
-                        <h2 className="text-[clamp(32px,4vw,50px)] font-inter font-bold leading-tight tracking-tight mb-4">
-                            Student Branch<br />
-                            at Nazarbayev University
-                        </h2>
+            {/* Main Content */}
+            <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6">
 
-                        {/* Divider line */}
-                        <div className="w-full max-w-xl h-1 bg-white mb-4"></div>
+                <img src={ieeeHeroSection} alt={'IEEE Hero Section'} />
 
-                        <p className="text-[clamp(32px,4vw,50px)] font-inter font-bold tracking-tight">
-                            est. 2017
-                        </p>
-                    </div>
-
-                    {/* Note text */}
-                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs text-white/70 max-w-[157px] hidden lg:block">
-                        <p>Development in progress</p>
+                {/* Student Branch Text */}
+                <div className="text-center mb-16">
+                    <div className="text-[30px] md:text-[50px] font-semibold uppercase leading-tight">
+                        {/* Multiple text layers for glow effect */}
+                        <div className="absolute text-ieee-lightblue [text-shadow:0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF]">
+                            Student Branch at<br />
+                            Nazarbayev University
+                        </div>
+                        <div className="absolute text-ieee-lightblue [text-shadow:0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57)]">
+                            Student Branch at<br />
+                            Nazarbayev University
+                        </div>
+                        <div className="relative text-white">
+                            Student Branch at<br />
+                            Nazarbayev University
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     );
-};
+}

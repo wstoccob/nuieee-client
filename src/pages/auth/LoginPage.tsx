@@ -13,7 +13,7 @@ const LoginPage = () => {
         try {
             const { token } = await login({ username, password });
             localStorage.setItem("token", token);
-            navigate("/dashboard");
+            navigate("/admin");
         } catch {
             setError("Login failed");
         }
