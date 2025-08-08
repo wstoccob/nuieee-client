@@ -18,13 +18,13 @@ export const BigTextSection = () => {
     return (
         <section
             ref={ref}
-            className="bg-black text-white w-screen px-4 py-8 md:px-12 mb-8 overflow-hidden"
+            className="bg-black text-white w-screen px-0 py-8 mb-8 overflow-hidden"
         >
-            <div className="max-w-none mx-auto">
+            <div className="w-full text-left">
                 {bigWords.map((word, idx) => (
                     <motion.h2
                         key={idx}
-                        className="whitespace-nowrap font-bold leading-none text-white"
+                        className="whitespace-nowrap font-bold leading-none text-white px-4 md:px-12"
                         initial={{ x: '-100%', opacity: 0 }}
                         animate={inView ? { x: 0, opacity: 1 } : {}}
                         transition={{
