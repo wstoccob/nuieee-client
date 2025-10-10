@@ -18,7 +18,7 @@ export const BigTextSection = () => {
     return (
         <section
             ref={ref}
-            className="bg-black text-white w-screen px-0 py-8 mb-8 overflow-hidden"
+            className="bg-black text-white w-full max-w-full px-0 py-8 mb-8 overflow-x-clip"
         >
             <div className="w-full text-left">
                 {bigWords.map((word, idx) => (
