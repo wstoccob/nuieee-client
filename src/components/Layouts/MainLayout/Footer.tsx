@@ -11,8 +11,7 @@ export default function Component() {
         <footer className="bg-[#00629c] text-black px-8 py-12">
             <div className="max-w-7xl mx-auto">
                 {/* Main footer content */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                    {/* Related Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 text-center">
                     <div>
                         <h3 className="text-black font-semibold mb-6 text-lg">RELATED</h3>
                         <div className="space-y-4">
@@ -56,7 +55,7 @@ export default function Component() {
                             </Link>
 
                             {/* Social Media Icons */}
-                            <div className="flex gap-3 mt-6">
+                            <div className="flex justify-center gap-3 mt-6">
                                 <Link to="https://www.linkedin.com/company/ieeenu/" className="text-black hover:opacity-70 transition-opacity">
                                     <img src={linkedinIcon} alt={"LinkedIn Icon"} />
                                 </Link>
@@ -77,13 +76,12 @@ export default function Component() {
                     </div>
                 </div>
 
-                {/* Bottom section with logo and copyright */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end pt-8 border-t border-black/20">
+                <div className="flex flex-col md:flex-row justify-between items-center md:items-end pt-8 border-t border-black/20 text-center md:text-right">
                     {/* IEEE Logo */}
-                    <img src={ieeeLogo} alt={"Ieee Logo"} />
+                    <img src={ieeeLogo} alt={"Ieee Logo"} className="mb-4 md:mb-0" />
 
                     {/* Copyright */}
-                    <div className="text-right text-black">
+                    <div className="text-black">
                         <div className="font-semibold mb-1">© 2025 IEEE Student Branch</div>
                         <div className="text-sm">Nazarbayev University, 53 Kabanbay Batyr Avenue, Astana, Kazakhstan.</div>
                     </div>
