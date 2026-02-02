@@ -1,7 +1,6 @@
 ﻿import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
-import webIcon from '../../../assets/icons/web_icon.svg';
 
 const navLinks = [
   { label: 'HACKATHON 2.0', to: '/hackathon' },
@@ -27,10 +26,11 @@ export default function Header() {
 
   return (
     <header className={`sticky top-0 z-[9999] w-full overflow-x-clip ${GLASS}`}>
-      <div className="mx-auto flex items-center h-16 lg:h-[100px] w-full max-w-[1440px] px-4 xl:px-[126px]">
-        {/* Logo */}
-        <Link to="/" className="shrink-0">
-          <img src={ieeeIcon} alt="IEEE Icon" className="h-8 w-auto lg:h-10" />
+
+      <div className="mx-auto flex h-16 lg:h-[100px] w-full max-w-[1440px] px-4 xl:px-[126px]">
+
+        <Link to="/" className="flex items-center h-16 lg:h-[100px] px-4 xl:px-[0px]">
+          <img src={ieeeIcon} alt="IEEE Icon" className="h-16 w-auto lg:h-20" />
         </Link>
 
         {/* Desktop inline nav */}
@@ -49,14 +49,6 @@ export default function Header() {
         </nav>
 
         {/* Desktop toggle (globe) */}
-        <button
-          onClick={() => setOpen(v => !v)}
-          className="ml-3 hidden xl:inline-flex p-2 rounded-md hover:bg-black/10"
-          aria-expanded={open}
-          aria-controls="site-menu"
-        >
-          <img src={webIcon} alt="Open menu" className="w-[142px] h-[54.63px]" />
-        </button>
 
         {/* Mobile toggle (burger) */}
         <button
