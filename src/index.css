@@ -216,3 +216,36 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff; /* Pure black background */
+}
+
+/*::-webkit-scrollbar-track:hover {*/
+/*  background: #c0c0c0; !* Slightly lighter grey on hover *!*/
+/*}*/
+
+::-webkit-scrollbar-thumb {
+  background-color: #00629c; /* ieee color */
+  border-radius: 9999px; /* Fully rounded pill shape */
+  /* This creates the "floating" look. We add a transparent border
+     and clip the background so the color only paints inside the padding area. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #1e84bf; /* Slightly lighter ieee color */
+}
+
+/*!* Firefox-specific support *!*/
+/*@supports (scrollbar-color: auto) {*/
+/*  * {*/
+/*    scrollbar-width: thin;*/
+/*    scrollbar-color: #00629C #000000;*/
+/*  }*/
+/*}*/
