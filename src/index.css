@@ -216,3 +216,8 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+* {
+  scrollbar-width: thin; /* Options: auto, thin, none */
+  scrollbar-color: #00629c #000000; /* thumb color | track color */
+}
