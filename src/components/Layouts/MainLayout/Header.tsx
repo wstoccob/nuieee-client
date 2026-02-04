@@ -30,7 +30,7 @@ export default function Header() {
       <div className="mx-auto flex h-16 lg:h-[100px] w-full max-w-[1440px] px-4 xl:px-[126px]">
 
         <Link to="/" className="flex items-center h-16 lg:h-[100px] px-4 xl:px-[0px]">
-          <img src={ieeeIcon} alt="IEEE Icon" className="h-16 w-auto lg:h-20" />
+          <img src={ieeeIcon} alt="IEEE Icon" className="h-14 w-auto lg:h-18" />
         </Link>
 
         {/* Desktop inline nav */}
