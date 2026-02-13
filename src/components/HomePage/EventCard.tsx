@@ -5,25 +5,40 @@ import type { EventHomePageDto } from '../../dtos/HomePage/EventHomePageDto.ts';
 
 export const EventCard: React.FC<EventHomePageDto> = ({ title, date, location, link }) => {
     return (
-        <div className="w-full max-w-[1430px] h-[200px] flex-shrink-0 mb-6 px-4">
-            <div className="w-full h-full border border-white bg-black rounded-[10px] relative p-4 md:p-8 flex items-center">
-                {/* Left Column: Title, Date, Location (if provided) */}
-                <div className="flex flex-col justify-center items-center text-white font-inter uppercase space-y-1 md:space-y-2 w-1/2 md:w-1/3">
-                    <div className="text-lg sm:text-xl md:text-2xl lg:text-[35px] font-semibold text-center">{title}</div>
-                    <div className="text-base sm:text-lg md:text-xl lg:text-[25px] font-semibold text-center">{date}</div>
-                    {location && <div className="text-base sm:text-lg md:text-xl lg:text-[25px] font-semibold text-center">{location}</div>}
+        <div className="w-full max-w-[1430px] px-4 mb-4">
+            <div className="w-full border border-white bg-black rounded-[10px] relative p-6 
+                            flex flex-col md:flex-row md:items-center md:justify-between">
+                
+                {/* IEEE Icon */}
+                <div className="mb-4 md:hidden flex justify-center">
+                    <img src={ieeeSmallBlueIcon} alt="IEEE Small Blue Icon" className="w-12 h-12" />
                 </div>
 
-                {/* IEEE Icon - Centered absolutely */}
-                <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-75 md:scale-100">
-                    <img src={ieeeSmallBlueIcon} alt="IEEE Small Blue Icon" />
+                {/* Event Details */}
+                <div className="flex flex-col items-center md:items-start md:w-1/3 text-white font-inter uppercase space-y-2">
+                    <div className="text-xl md:text-2xl lg:text-[35px] font-semibold text-center md:text-left break-words w-full">
+                        {title}
+                    </div>
+                    <div className="text-lg md:text-xl lg:text-[25px] font-semibold text-center md:text-left">
+                        {date}
+                    </div>
+                    {location && (
+                        <div className="text-lg md:text-xl lg:text-[25px] font-semibold text-center md:text-left">
+                            {location}
+                        </div>
+                    )}
                 </div>
 
-                {/* Explore More Link - Right side */}
-                <div className="absolute right-4 md:right-8 top-1/2 transform -translate-y-1/2 w-1/2 md:w-1/4 text-right">
+                {/* Desktop Icon */}
+                <div className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <img src={ieeeSmallBlueIcon} alt="IEEE Small Blue Icon" className="w-16 h-16"/>
+                </div>
+
+                {/* Explore More Link */}
+                <div className="mt-4 md:mt-0 md:w-1/4 text-center md:text-right">
                     <Link
                         to={link}
-                        className="text-ieee-blue font-inter text-sm sm:text-base md:text-lg lg:text-[25px] font-semibold underline uppercase hover:text-ieee-light-blue transition-colors"
+                        className="inline-block text-ieee-blue font-inter text-base md:text-lg lg:text-[25px] font-semibold underline uppercase hover:text-ieee-light-blue transition-colors"
                     >
                         explore more
                     </Link>
