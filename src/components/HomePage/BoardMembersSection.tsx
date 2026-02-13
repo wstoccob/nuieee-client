@@ -1,16 +1,15 @@
-﻿import Slider from "react-slick";
+import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useState } from "react";
 
-import aldiyarPhotoLink from '../../assets/images/aldiyar.jpg';
-import altairPhotoLink from '../../assets/images/altair.jpg';
-import amirPhotoLink from '../../assets/images/amir.jpg';
-import aidanaPhotoLink from '../../assets/images/aidana.jpg';
-import sabinaPhotoLink from '../../assets/images/sabina.jpg';
+import miraiyaPhotoLink from '../../assets/images/miraiya.jpg';
+import maxatPhotoLink from '../../assets/images/maxat.jpg';
+import bekzatPhotoLink from '../../assets/images/bekzat.jpg';
+import darigaPhotoLink from '../../assets/images/dariga.jpg';
+import yerassylPhotoLink from '../../assets/images/yerassyl.jpg';
 import alinurPhotoLink from '../../assets/images/alinur.png';
-import firuzaPhotoLink from '../../assets/images/firuza.jpg';
-import mishaPhotoLink from '../../assets/images/misha.jpg';
+import ruanaPhotoLink from '../../assets/images/ruana.jpg';
 
 interface BoardMember {
     name: string;
@@ -20,44 +19,39 @@ interface BoardMember {
 
 const boardMembers: BoardMember[] = [
     {
-        name: "Amir Izimov",
-        role: "president",
-        image: amirPhotoLink,
+        name: "Bekzat Bekenuly",
+        role: "President",
+        image: bekzatPhotoLink,
     },
     {
-        name: "Aldiyar Zhetkeyev",
-        role: "hr head",
-        image: aldiyarPhotoLink,
+        name: "Miraiya Kospanova",
+        role: "HR head",
+        image: miraiyaPhotoLink,
     },
     {
-        name: "Altair Ibrayev",
-        role: "treasurer",
-        image: altairPhotoLink,
+        name: "Maxat Alpamyssov",
+        role: "Treasurer",
+        image: maxatPhotoLink,
     },
     {
-        name: "Aidana Alkenova",
-        role: "vice-president",
-        image: aidanaPhotoLink,
+        name: "Dariga Suleimanova",
+        role: "Vice-president",
+        image: darigaPhotoLink,
     },
     {
-        name: "Sabina Sairangazyyeva",
-        role: "secretary",
-        image: sabinaPhotoLink,
+        name: "Yerassyl Shaimoldayev",
+        role: "Secretary",
+        image: yerassylPhotoLink,
     },
     {
         name: "Alinur Seisekov",
-        role: "web-development head",
+        role: "Web-development head",
         image: alinurPhotoLink,
     },
     {
-        name: "Firuza Barayeva",
-        role: "event head",
-        image: firuzaPhotoLink,
-    },
-    {
-        name: "Mikhail Yurikov",
-        role: "pr head",
-        image: mishaPhotoLink,
+        name: "Ruana Bayakhmetova",
+        role: "PR Head",
+        image: ruanaPhotoLink,
     },
 ];
 
