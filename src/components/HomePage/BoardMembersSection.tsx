@@ -3,14 +3,6 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useState } from "react";
 
-import miraiyaPhotoLink from '../../assets/images/miraiya.jpg';
-import maxatPhotoLink from '../../assets/images/maxat.jpg';
-import bekzatPhotoLink from '../../assets/images/bekzat.jpg';
-import darigaPhotoLink from '../../assets/images/dariga.jpg';
-import yerassylPhotoLink from '../../assets/images/yerassyl.jpg';
-import alinurPhotoLink from '../../assets/images/alinur.png';
-import ruanaPhotoLink from '../../assets/images/ruana.jpg';
-
 interface BoardMember {
     name: string;
     role: string;
@@ -21,37 +13,37 @@ const boardMembers: BoardMember[] = [
     {
         name: "Bekzat Bekenuly",
         role: "President",
-        image: bekzatPhotoLink,
+        image: "https://minio.ieee.nu/static/board-members/bekzat.jpg",
     },
     {
         name: "Miraiya Kospanova",
         role: "HR head",
-        image: miraiyaPhotoLink,
+        image: "https://minio.ieee.nu/static/board-members/miraiya.jpg",
     },
     {
         name: "Maxat Alpamyssov",
         role: "Treasurer",
-        image: maxatPhotoLink,
+        image: "https://minio.ieee.nu/static/board-members/maxat.jpg",
     },
     {
         name: "Dariga Suleimanova",
         role: "Vice-president",
-        image: darigaPhotoLink,
+        image: "https://minio.ieee.nu/static/board-members/dariga.jpg",
     },
     {
         name: "Yerassyl Shaimoldayev",
         role: "Secretary",
-        image: yerassylPhotoLink,
+        image: "https://minio.ieee.nu/static/board-members/yerassyl.jpg",
     },
     {
         name: "Alinur Seisekov",
         role: "Web-development head",
-        image: alinurPhotoLink,
+        image: "https://minio.ieee.nu/static/board-members/alinur.jpg",
     },
     {
         name: "Ruana Bayakhmetova",
         role: "PR Head",
-        image: ruanaPhotoLink,
+        image: "https://minio.ieee.nu/static/board-members/ruana.jpg",
     },
 ];
 
