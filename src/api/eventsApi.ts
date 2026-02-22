@@ -18,7 +18,10 @@ export const eventsApi = {
   },
   async createEvent(payload: CreateEventCommand): Promise<EventDto> {
     const res = await axiosInstance.post("/events/create-event", payload);
-    return res.data as EventDto;
+    // Backend returns just the ID as a string, so we create a minimal EventDto object
+    return {
+      id: res.data as string,
+    } as EventDto;
   },
   async updateEvent(payload: UpdateEventCommand): Promise<EventDto> {
     const res = await axiosInstance.put("/events/update-event", payload);
