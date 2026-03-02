@@ -87,7 +87,7 @@ const LoginPage = () => {
                             disabled={isLoading}
                         />
                         {capsLockActive && (
-                            <p className="text-yellow-500 text-sm">Warning: Caps Lock is ON</p>
+                            <p className="text-red-500 text-sm">Caps Lock is ON</p>
                         )}
                     </div>
 
