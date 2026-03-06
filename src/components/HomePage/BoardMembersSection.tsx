@@ -26,7 +26,7 @@ const boardMembers: BoardMember[] = [
         image: "https://minio.ieee.nu/static/board-members/maxat.jpg",
     },
     {
-        name: "Dariga Suleimanova",
+        name: "Dariga Suleimenova",
         role: "Vice-president",
         image: "https://minio.ieee.nu/static/board-members/dariga.jpg",
     },
