@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import HomePage from '../pages/HomePage'
 import LoginPage from '../pages/auth/LoginPage.tsx'
 import SuperAdminPage from '../pages/superadmin/SuperAdminPage.tsx'
@@ -9,6 +9,7 @@ import AdminEventsPage from "../pages/admin/AdminEventsPage.tsx";
 import AddNewEventPage from "../pages/admin/AddNewEventPage.tsx";
 import EventDetailPage from "../pages/event/EventDetailPage.tsx";
 import EventsListPage from "../pages/event/EventsListPage.tsx";
+import PodcastsPage from "../pages/PodcastsPage.tsx";
 
 export const AppRouter = () => {
     return (
@@ -24,6 +25,7 @@ export const AppRouter = () => {
                 <Route path="/admin/hackathon" element={ <HackathonAdminPage />} />
                 <Route path="/events" element={<EventsListPage />} />
                 <Route path="/events/:id" element={<EventDetailPage />} />
+                <Route path="/podcasts" element={<PodcastsPage />} />
             </Routes>
         </BrowserRouter>
     )

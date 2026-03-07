@@ -1,12 +1,12 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
-import webIcon from '../../../assets/icons/web_icon.svg';
 
 const navLinks = [
   { label: 'HACKATHON 2.0', to: '/hackathon' },
   { label: 'ABOUT US', to: '/about' },
   { label: 'EVENTS', to: '/events' },
+  { label: 'PODCASTS', to: '/podcasts' },
   { label: 'BOARD MEMBERS', to: '/board' },
   { label: 'CONTACT US', to: '/contact' },
 ];
@@ -34,12 +34,12 @@ export default function Header() {
         </Link>
 
         {/* Desktop inline nav */}
-        <nav className="hidden lg:flex flex-1 min-w-0 justify-center items-center gap-2 lg:gap-2.5">
+        <nav className="hidden lg:flex flex-1 min-w-0 justify-center items-center gap-2 lg:gap-2.5 lg:pl-8">
           {navLinks.map(({ label, to }) => (
             <Link
               key={to}
               to={to}
-              className="px-3 lg:px-3 xl:px-5 py-2 lg:py-2 xl:py-3 rounded-md hover:bg-black/10 shrink-0"
+              className="px-3 lg:px-3 xl:px-5 py-2 lg:py-2 xl:py-3 rounded-md hover:bg-black/10"
             >
               <span className="text-white text-sm md:text-base lg:text-lg xl:text-[22px] font-bold whitespace-nowrap">
                 {label}
@@ -47,16 +47,6 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-
-        {/* Desktop toggle (globe) */}
-        <button
-          onClick={() => setOpen(v => !v)}
-          className="ml-3 hidden xl:inline-flex p-2 rounded-md hover:bg-black/10"
-          aria-expanded={open}
-          aria-controls="site-menu"
-        >
-          <img src={webIcon} alt="Open menu" className="w-[142px] h-[54.63px]" />
-        </button>
 
         {/* Mobile toggle (burger) */}
         <button
