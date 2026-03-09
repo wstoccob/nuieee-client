@@ -136,6 +136,32 @@ button:focus-visible {
   transform: scale(1.05);
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .group {
+    -webkit-mask-image: -webkit-radial-gradient(white, black); /* Force anti-aliasing */
+    mask-image: radial-gradient(white, black);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+  }
+  
+  .group img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    image-rendering: -webkit-optimize-contrast; /* Better edge rendering */
+  }
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -webkit-backface-visibility: hidden;
+}
+
+.page-enter, .page-exit {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
