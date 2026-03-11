@@ -1,7 +1,6 @@
 ﻿import { Link, useNavigate } from 'react-router-dom';
 import {useAuth} from "../../../services/useAuth.ts";
 import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
-import webIcon from '../../../assets/icons/web_icon.svg';
 
 const adminNavLinks = [
     { label: 'Events', to: '/admin/events' },
@@ -20,10 +19,10 @@ const AdminHeader = () => {
     return (
         <header className="w-full bg-black flex justify-center">
             <div className="hidden lg:flex w-full max-w-[1440px] h-[100px] px-4 xl:px-[126px] items-center">
-                <nav className="flex w-full items-center gap-2.5">
+                <nav className="flex w-full items-center gap-2">
                     {/* Logo */}
                     <Link to="/admin" className="mr-auto">
-                        <img src={ieeeIcon} alt="IEEE Icon" />
+                        <img src={ieeeIcon} alt="IEEE Icon" className='className="h-14 w-auto lg:h-18' />
                     </Link>
 
                     {/* Navigation Items */}
@@ -54,10 +53,6 @@ const AdminHeader = () => {
                         )}
                     </div>
 
-                    {/* Globe Icon */}
-                    <div>
-                        <img src={webIcon} alt="Web Icon" className="w-[142px] h-[54.63px] px-8 py-1" />
-                    </div>
                 </nav>
             </div>
         </header>
