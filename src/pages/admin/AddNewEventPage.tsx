@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useRef } from "react";
@@ -9,6 +9,13 @@ import minioApi from "@/api/minioApi";
 import type { CreateEventCommand } from "@/dtos/Events/EventDto";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+
+// New imports for the Date/Time Picker Popover
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 const MAX_PHOTOS = parseInt(import.meta.env.VITE_MAX_EVENT_PHOTOS || "20", 10);
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -26,7 +33,9 @@ interface PhotoUpload {
 const schema = z.object({
   title: z.string().min(2, "Title too short").max(200),
   description: z.string().min(10, "Description too short").max(5000),
-  eventDateTime: z.string(), // we'll ensure it's valid before submit
+  eventDateTime: z.date({
+    required_error: "Event date and time is required",
+  }),
   registrationLink: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
@@ -41,7 +50,7 @@ export default function AddNewEventPage() {
     defaultValues: {
       title: "",
       description: "",
-      eventDateTime: "",
+      eventDateTime: undefined,
       registrationLink: "",
     },
   });
@@ -62,36 +71,29 @@ export default function AddNewEventPage() {
   const handleFileSelection = (files: FileList | null) => {
     if (!files) return;
 
-    const newPhotos: PhotoUpload[] = [];
+    // 1. Filter out invalid files first
+    const validFiles = Array.from(files).filter(isValidFile);
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    // 2. Calculate exactly how many slots are left
+    const availableSlots = MAX_PHOTOS - photos.length;
 
-      // Validate file type
-      if (!isValidFile(file)) continue;
-
-      // Check max photos limit
-      if (photos.length + newPhotos.length >= MAX_PHOTOS) {
-        toast.error(`Maximum ${MAX_PHOTOS} photos allowed`);
-        break;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = e.target?.result as string;
-        setPhotos((prev) => [
-          ...prev,
-          {
-            id: generatePhotoId(),
-            file,
-            preview,
-            alternativeText: "",
-            uploading: false,
-          },
-        ]);
-      };
-      reader.readAsDataURL(file);
+    if (validFiles.length > availableSlots) {
+      toast.error(`Maximum ${MAX_PHOTOS} photos allowed. Only adding the first ${availableSlots}.`);
     }
+
+    // 3. Slice the array to only allow the permitted amount
+    const filesToAdd = validFiles.slice(0, Math.max(0, availableSlots));
+
+    // 4. Create new photo objects synchronously using Object URLs
+    const newPhotosToAdd: PhotoUpload[] = filesToAdd.map((file) => ({
+      id: generatePhotoId(),
+      file,
+      preview: URL.createObjectURL(file), // Much faster than FileReader
+      alternativeText: "",
+      uploading: false,
+    }));
+
+    setPhotos((prev) => [...prev, ...newPhotosToAdd]);
   };
 
   // Handle drag over
@@ -134,23 +136,18 @@ export default function AddNewEventPage() {
   // Upload a single photo
   const uploadPhoto = async (photo: PhotoUpload): Promise<string> => {
     try {
-      // Get pre-signed URL and confirmed fileName from backend
       const { uploadUrl, fileName } = await minioApi.getUploadUrl(photo.file.name);
 
-      // Update uploading state
       setPhotos((prev) =>
         prev.map((p) =>
           p.id === photo.id ? { ...p, uploading: true } : p
         )
       );
 
-      // Upload file to pre-signed URL
       await minioApi.uploadFile(uploadUrl, photo.file);
 
-      // Construct the permanent URL
       const permanentUrl = minioApi.constructPermanentUrl(fileName);
 
-      // Clear uploading state and store the permanent URL
       setPhotos((prev) =>
         prev.map((p) =>
           p.id === photo.id
@@ -161,8 +158,7 @@ export default function AddNewEventPage() {
 
       return permanentUrl;
     } catch (error: any) {
-      const errorMsg =
-        error?.message || "Failed to upload photo";
+      const errorMsg = error?.message || "Failed to upload photo";
       setPhotos((prev) =>
         prev.map((p) =>
           p.id === photo.id
@@ -177,7 +173,6 @@ export default function AddNewEventPage() {
   // Upload all photos
   const uploadAllPhotos = async (): Promise<string[]> => {
     const uploadPromises = photos.map((photo) => uploadPhoto(photo));
-
     const results = await Promise.allSettled(uploadPromises);
 
     const uploadedUrls = results
@@ -185,16 +180,12 @@ export default function AddNewEventPage() {
         if (result.status === "fulfilled") {
           return result.value;
         } else {
-          console.error(
-            `Upload failed for photo ${idx}:`,
-            result.reason
-          );
+          console.error(`Upload failed for photo ${idx}:`, result.reason);
           return null;
         }
       })
       .filter((url): url is string => url !== null);
 
-    // Check if any uploads failed
     const failedUploads = results.some(
       (result) => result.status === "rejected"
     );
@@ -206,36 +197,32 @@ export default function AddNewEventPage() {
   };
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
+    const toastId = toast.loading("Processing event...");
     try {
-      if (!values.eventDateTime) {
-        toast.error("Event date/time required");
-        return;
-      }
-
       // Upload photos if any exist
       let uploadedPhotoUrls: string[] = [];
       if (photos.length > 0) {
-        toast.loading("Uploading photos...");
+        toast.loading("Uploading photos...", { id: toastId });
         uploadedPhotoUrls = await uploadAllPhotos();
-        toast.dismiss();
       }
 
       const payload: CreateEventCommand = {
         title: values.title,
         description: values.description,
-        eventDateTime: new Date(values.eventDateTime).toISOString(),
+        eventDateTime: values.eventDateTime.toISOString(),
         registrationLink: values.registrationLink || undefined,
-        photos: uploadedPhotoUrls.map((url, idx) => ({
-          alternativeText: photos[idx]?.alternativeText || "",
-          photoLink: url,
+        photos: photos.map((photo, idx) => ({
+          alternativeText: photo.alternativeText || "",
+          photoLink: uploadedPhotoUrls[idx],
         })),
       };
 
       const created = await eventsApi.createEvent(payload);
-      toast.success("Event created");
+      toast.success("Event created", { id: toastId });
       navigate(`/events/${created.id}`);
+
     } catch (e: any) {
-      toast.error(e?.response?.data?.message || e?.message || "Failed to create event");
+      toast.error(e?.response?.data?.message || e?.message || "Failed to create event", { id: toastId });
     }
   };
 
@@ -252,34 +239,95 @@ export default function AddNewEventPage() {
         >
           {/* Title */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Title
             </label>
             <input
               type="text"
               {...form.register("title")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50"
-              placeholder="Amazing Engineering Talk"
+              className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50 transition-colors"
+              placeholder="Amazing Engineering Podcast"
             />
             {form.formState.errors.title && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold">
                 {form.formState.errors.title.message}
               </p>
             )}
           </div>
 
-          {/* DateTime */}
+          {/* DateTime Picker Popover */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Event Date & Time
             </label>
-            <input
-              type="datetime-local"
-              {...form.register("eventDateTime")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue"
+            <Controller
+              control={form.control}
+              name="eventDateTime"
+              render={({ field }) => (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex w-full items-center justify-start text-left rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:outline-none focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue transition-colors",
+                        !field.value && "text-white/50"
+                      )}
+                    >
+                      <CalendarIcon className="mr-3 h-5 w-5 opacity-70" />
+                      {field.value ? (
+                        format(field.value, "PPP 'at' HH:mm")
+                      ) : (
+                        <span>Select a date and time</span>
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-black border-2 border-[#555] text-white">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => {
+                        if (!date) return;
+                        if (field.value) {
+                          date.setHours(field.value.getHours());
+                          date.setMinutes(field.value.getMinutes());
+                        }
+                        field.onChange(date);
+                      }}
+                      initialFocus
+                      className="bg-black text-white rounded-t-md"
+                    />
+                    <div className="p-4 border-t-2 border-[#555] bg-black/50 flex flex-col gap-3 rounded-b-md">
+                      <span className="text-base font-inter font-semibold text-white">
+                        Select Time
+                      </span>
+
+                      {/* Native Time Input - Forced 24-hour format with lang="en-GB" */}
+                      <input
+                        type="time"
+                        lang="en-GB"
+                        className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:outline-none focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue transition-colors [color-scheme:dark]"
+                        value={field.value ? format(field.value, "HH:mm") : ""}
+                        onChange={(e) => {
+                          const timeStr = e.target.value;
+                          const newDate = field.value ? new Date(field.value) : new Date();
+
+                          if (!timeStr) {
+                            newDate.setHours(0, 0, 0, 0);
+                          } else {
+                            const [hours, minutes] = timeStr.split(":").map(Number);
+                            newDate.setHours(hours, minutes, 0, 0);
+                          }
+
+                          field.onChange(newDate);
+                        }}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
             />
             {form.formState.errors.eventDateTime && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold mt-1">
                 {form.formState.errors.eventDateTime.message}
               </p>
             )}
@@ -287,17 +335,17 @@ export default function AddNewEventPage() {
 
           {/* Registration Link */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
-              Registration Link (optional)
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
+              Registration Link (Optional)
             </label>
             <input
               type="url"
               {...form.register("registrationLink")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50"
+              className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50 transition-colors"
               placeholder="https://"
             />
             {form.formState.errors.registrationLink && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold">
                 {form.formState.errors.registrationLink.message}
               </p>
             )}
@@ -305,17 +353,17 @@ export default function AddNewEventPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Description
             </label>
             <textarea
               rows={6}
               {...form.register("description")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50"
+              className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50 transition-colors"
               placeholder="Describe the event..."
             />
             {form.formState.errors.description && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold">
                 {form.formState.errors.description.message}
               </p>
             )}
@@ -323,7 +371,7 @@ export default function AddNewEventPage() {
 
           {/* Photos */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Photos ({photos.length}/{MAX_PHOTOS})
             </label>
 
@@ -336,7 +384,7 @@ export default function AddNewEventPage() {
               className={`border-2 border-dashed rounded-lg p-8 mb-6 text-center transition-all cursor-pointer ${
                 dragActive
                   ? "border-ieee-blue bg-ieee-blue/10"
-                  : "border-white/50 bg-black/30 hover:border-white/70"
+                  : "border-[#555] bg-black/30 hover:border-ieee-blue"
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -365,7 +413,7 @@ export default function AddNewEventPage() {
                 {photos.map((photo) => (
                   <div
                     key={photo.id}
-                    className="border-2 border-white/30 rounded-lg overflow-hidden bg-black/50"
+                    className="border-2 border-[#555] rounded-lg overflow-hidden bg-black/50"
                   >
                     {/* Preview Image */}
                     <div className="relative w-full h-40 bg-black flex items-center justify-center overflow-hidden">
@@ -426,7 +474,7 @@ export default function AddNewEventPage() {
                           updateAltText(photo.id, e.target.value)
                         }
                         placeholder="Alternative text"
-                        className="w-full rounded-md border border-white/50 bg-black text-white px-2 py-1 text-sm font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/40"
+                        className="w-full rounded-md border border-[#555] hover:border-ieee-blue bg-black text-white px-2 py-1 text-sm font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/40 transition-colors"
                         disabled={photo.uploading}
                       />
                       <Button
@@ -453,16 +501,15 @@ export default function AddNewEventPage() {
           <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
             <Button
               type="button"
-              variant="outline"
               onClick={() => navigate("/admin/events")}
-              className="border-white text-white hover:bg-white/10 font-semibold uppercase text-lg px-8 py-3"
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold uppercase text-lg px-8 py-3 transition-colors"
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={form.formState.isSubmitting}
-              className="bg-ieee-blue hover:bg-ieee-blue/90 text-white font-semibold uppercase text-lg px-8 py-3"
+              className="bg-ieee-blue hover:bg-ieee-blue/90 text-white font-semibold uppercase text-lg px-8 py-3 transition-colors"
             >
               {form.formState.isSubmitting ? "Creating..." : "Create Event"}
             </Button>
