@@ -18,13 +18,15 @@ export const BigTextSection = () => {
     return (
         <section
             ref={ref}
-            className="bg-black text-white w-full max-w-full px-0 py-8 mb-8 overflow-hidden"
+            className="bg-black text-white py-16 lg:py-24"
         >
-            <div className="w-full text-left">
+            {/* MATCHED WRAPPER: Exact same classes as the AboutUsSection div */}
+            <div className="container mx-auto px-4 text-left">
                 {bigWords.map((word, idx) => (
                     <motion.h2
                         key={idx}
-                        className="whitespace-nowrap font-bold leading-none text-white px-4 md:px-12"
+                        // Added font-inter and font-extrabold here to match your 'about us' typography!
+                        className="whitespace-nowrap font-inter font-bold leading-none text-white lowercase"
                         initial={{ x: '-100%', opacity: 0 }}
                         animate={inView ? { x: 0, opacity: 1 } : {}}
                         transition={{
