@@ -7,7 +7,6 @@ const navLinks = [
   { label: 'ABOUT US', to: '/about' },
   { label: 'EVENTS', to: '/events' },
   { label: 'PODCASTS', to: '/podcasts' },
-  { label: 'BOARD MEMBERS', to: '/board' },
   { label: 'CONTACT US', to: '/contact' },
 ];
 
