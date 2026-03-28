@@ -8,7 +8,6 @@ const navLinks = [
   { label: 'EVENTS', to: '/events' },
   { label: 'PODCASTS', to: '/podcasts' },
   { label: 'BOARD MEMBERS', to: '/board' },
-  { label: 'CONTACT US', to: '/contact' },
 ];
 
 // one source of truth for the “frosted” look
