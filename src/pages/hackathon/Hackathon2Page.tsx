@@ -5,7 +5,7 @@ const Hackathon2Page = () => {
     return (
         <div className="min-h-screen bg-black">
             <Header />
-                <section className="relative w-full min-h-[calc(100svh-112px)] lg:min-h-[calc(100svh-148px)] bg-black ">
+                <section className="relative w-full min-h-screen lg:min-h-screen bg-black ">
                     {/* Background blur effect */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="w-[1165px] h-[662px] bg-blue-500/25 blur-[125px]" />
