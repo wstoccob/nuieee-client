@@ -13,37 +13,37 @@ const boardMembers: BoardMember[] = [
     {
         name: "Bekzat Bekenuly",
         role: "President",
-        image: "https://minio.ieee.nu/static/board-members/bekzat.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Bekzat_optimized_2000.jpg",
     },
     {
         name: "Miraiya Kospanova",
         role: "HR head",
-        image: "https://minio.ieee.nu/static/board-members/miraiya.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Miraya_optimized_2000.jpg",
     },
     {
         name: "Maxat Alpamyssov",
         role: "Treasurer",
-        image: "https://minio.ieee.nu/static/board-members/maxat.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Mazat_3_optimized_2000.jpg",
     },
     {
         name: "Dariga Suleimenova",
         role: "Vice-president",
-        image: "https://minio.ieee.nu/static/board-members/dariga.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Dariga_optimized_2000.jpg",
     },
     {
         name: "Yerassyl Shaimoldayev",
         role: "Secretary",
-        image: "https://minio.ieee.nu/static/board-members/yerassyl.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Yerassyl_optimized_2000.jpg",
     },
     {
         name: "Alinur Seisekov",
         role: "Web-development head",
-        image: "https://minio.ieee.nu/static/board-members/alinur.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Alinur_optimized_2000.jpg",
     },
     {
         name: "Ruana Bayakhmetova",
         role: "PR Head",
-        image: "https://minio.ieee.nu/static/board-members/ruana.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Ruana_optimized_2000.jpg",
     },
 ];
 
