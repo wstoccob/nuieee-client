@@ -23,7 +23,7 @@ const boardMembers: BoardMember[] = [
     {
         name: "Maxat Alpamyssov",
         role: "Treasurer",
-        image: "https://minio.ieee.nu/static/board-members/Mazat_3_optimized_2000.jpg",
+        image: "https://minio.ieee.nu/static/board-members/Maxat_3_optimized_2000.jpg",
     },
     {
         name: "Dariga Suleimenova",
