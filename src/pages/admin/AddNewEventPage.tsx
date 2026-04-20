@@ -3,7 +3,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useRef } from "react";
 import AdminHeader from "@/components/Layouts/AdminPageLayout/AdminHeader";
-import { Button } from "@/components/ui/button";
 import eventsApi from "@/api/eventsApi";
 import minioApi from "@/api/minioApi";
 import type { CreateEventCommand } from "@/dtos/Events/EventDto";
@@ -26,7 +25,7 @@ interface PhotoUpload {
 const schema = z.object({
   title: z.string().min(2, "Title too short").max(200),
   description: z.string().min(10, "Description too short").max(5000),
-  eventDateTime: z.string(), // we'll ensure it's valid before submit
+  eventDateTime: z.string().min(1, "Event date and time is required"),
   registrationLink: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
@@ -62,36 +61,29 @@ export default function AddNewEventPage() {
   const handleFileSelection = (files: FileList | null) => {
     if (!files) return;
 
-    const newPhotos: PhotoUpload[] = [];
+    // 1. Filter out invalid files first
+    const validFiles = Array.from(files).filter(isValidFile);
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
+    // 2. Calculate exactly how many slots are left
+    const availableSlots = MAX_PHOTOS - photos.length;
 
-      // Validate file type
-      if (!isValidFile(file)) continue;
-
-      // Check max photos limit
-      if (photos.length + newPhotos.length >= MAX_PHOTOS) {
-        toast.error(`Maximum ${MAX_PHOTOS} photos allowed`);
-        break;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = e.target?.result as string;
-        setPhotos((prev) => [
-          ...prev,
-          {
-            id: generatePhotoId(),
-            file,
-            preview,
-            alternativeText: "",
-            uploading: false,
-          },
-        ]);
-      };
-      reader.readAsDataURL(file);
+    if (validFiles.length > availableSlots) {
+      toast.error(`Maximum ${MAX_PHOTOS} photos allowed. Only adding the first ${availableSlots}.`);
     }
+
+    // 3. Slice the array to only allow the permitted amount
+    const filesToAdd = validFiles.slice(0, Math.max(0, availableSlots));
+
+    // 4. Create new photo objects synchronously using Object URLs
+    const newPhotosToAdd: PhotoUpload[] = filesToAdd.map((file) => ({
+      id: generatePhotoId(),
+      file,
+      preview: URL.createObjectURL(file), // Much faster than FileReader
+      alternativeText: "",
+      uploading: false,
+    }));
+
+    setPhotos((prev) => [...prev, ...newPhotosToAdd]);
   };
 
   // Handle drag over
@@ -134,23 +126,18 @@ export default function AddNewEventPage() {
   // Upload a single photo
   const uploadPhoto = async (photo: PhotoUpload): Promise<string> => {
     try {
-      // Get pre-signed URL and confirmed fileName from backend
       const { uploadUrl, fileName } = await minioApi.getUploadUrl(photo.file.name);
 
-      // Update uploading state
       setPhotos((prev) =>
         prev.map((p) =>
           p.id === photo.id ? { ...p, uploading: true } : p
         )
       );
 
-      // Upload file to pre-signed URL
       await minioApi.uploadFile(uploadUrl, photo.file);
 
-      // Construct the permanent URL
       const permanentUrl = minioApi.constructPermanentUrl(fileName);
 
-      // Clear uploading state and store the permanent URL
       setPhotos((prev) =>
         prev.map((p) =>
           p.id === photo.id
@@ -161,8 +148,7 @@ export default function AddNewEventPage() {
 
       return permanentUrl;
     } catch (error: any) {
-      const errorMsg =
-        error?.message || "Failed to upload photo";
+      const errorMsg = error?.message || "Failed to upload photo";
       setPhotos((prev) =>
         prev.map((p) =>
           p.id === photo.id
@@ -177,7 +163,6 @@ export default function AddNewEventPage() {
   // Upload all photos
   const uploadAllPhotos = async (): Promise<string[]> => {
     const uploadPromises = photos.map((photo) => uploadPhoto(photo));
-
     const results = await Promise.allSettled(uploadPromises);
 
     const uploadedUrls = results
@@ -185,16 +170,12 @@ export default function AddNewEventPage() {
         if (result.status === "fulfilled") {
           return result.value;
         } else {
-          console.error(
-            `Upload failed for photo ${idx}:`,
-            result.reason
-          );
+          console.error(`Upload failed for photo ${idx}:`, result.reason);
           return null;
         }
       })
       .filter((url): url is string => url !== null);
 
-    // Check if any uploads failed
     const failedUploads = results.some(
       (result) => result.status === "rejected"
     );
@@ -206,18 +187,13 @@ export default function AddNewEventPage() {
   };
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
+    const toastId = toast.loading("Processing event...");
     try {
-      if (!values.eventDateTime) {
-        toast.error("Event date/time required");
-        return;
-      }
-
       // Upload photos if any exist
       let uploadedPhotoUrls: string[] = [];
       if (photos.length > 0) {
-        toast.loading("Uploading photos...");
+        toast.loading("Uploading photos...", { id: toastId });
         uploadedPhotoUrls = await uploadAllPhotos();
-        toast.dismiss();
       }
 
       const payload: CreateEventCommand = {
@@ -225,17 +201,18 @@ export default function AddNewEventPage() {
         description: values.description,
         eventDateTime: new Date(values.eventDateTime).toISOString(),
         registrationLink: values.registrationLink || undefined,
-        photos: uploadedPhotoUrls.map((url, idx) => ({
-          alternativeText: photos[idx]?.alternativeText || "",
-          photoLink: url,
+        photos: photos.map((photo, idx) => ({
+          alternativeText: photo.alternativeText || "",
+          photoLink: uploadedPhotoUrls[idx],
         })),
       };
 
       const created = await eventsApi.createEvent(payload);
-      toast.success("Event created");
+      toast.success("Event created", { id: toastId });
       navigate(`/events/${created.id}`);
+
     } catch (e: any) {
-      toast.error(e?.response?.data?.message || e?.message || "Failed to create event");
+      toast.error(e?.response?.data?.message || e?.message || "Failed to create event", { id: toastId });
     }
   };
 
@@ -248,38 +225,38 @@ export default function AddNewEventPage() {
         </h1>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="max-w-4xl space-y-8 bg-black border-2 border-white rounded-lg shadow-2xl p-8 md:p-12"
+          className="max-w-4xl space-y-8 bg-black border-2 border-[#555] rounded-lg shadow-2xl p-8 md:p-12"
         >
           {/* Title */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Title
             </label>
             <input
               type="text"
               {...form.register("title")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50"
-              placeholder="Amazing Engineering Talk"
+              className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50 transition-colors"
+              placeholder="Amazing Engineering Podcast"
             />
             {form.formState.errors.title && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold">
                 {form.formState.errors.title.message}
               </p>
             )}
           </div>
 
-          {/* DateTime */}
+          {/* Native DateTime Picker */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Event Date & Time
             </label>
             <input
               type="datetime-local"
               {...form.register("eventDateTime")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue"
+              className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:outline-none focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue transition-colors [color-scheme:dark]"
             />
             {form.formState.errors.eventDateTime && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold mt-1">
                 {form.formState.errors.eventDateTime.message}
               </p>
             )}
@@ -287,17 +264,17 @@ export default function AddNewEventPage() {
 
           {/* Registration Link */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
-              Registration Link (optional)
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
+              Registration Link (Optional)
             </label>
             <input
               type="url"
               {...form.register("registrationLink")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50"
+              className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50 transition-colors"
               placeholder="https://"
             />
             {form.formState.errors.registrationLink && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold">
                 {form.formState.errors.registrationLink.message}
               </p>
             )}
@@ -305,17 +282,17 @@ export default function AddNewEventPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Description
             </label>
             <textarea
               rows={6}
               {...form.register("description")}
-              className="w-full rounded-md border-2 border-white bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50"
+              className="w-full rounded-md border-2 border-[#555] hover:border-ieee-blue bg-black text-white px-4 py-3 text-lg font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/50 transition-colors"
               placeholder="Describe the event..."
             />
             {form.formState.errors.description && (
-              <p className="text-red-400 text-sm mt-2 font-semibold">
+              <p className="text-red-400 text-m font-semibold">
                 {form.formState.errors.description.message}
               </p>
             )}
@@ -323,7 +300,7 @@ export default function AddNewEventPage() {
 
           {/* Photos */}
           <div>
-            <label className="block text-white text-xl font-inter font-semibold mb-3 uppercase">
+            <label className="block text-white text-xl font-inter font-semibold mb-2">
               Photos ({photos.length}/{MAX_PHOTOS})
             </label>
 
@@ -336,7 +313,7 @@ export default function AddNewEventPage() {
               className={`border-2 border-dashed rounded-lg p-8 mb-6 text-center transition-all cursor-pointer ${
                 dragActive
                   ? "border-ieee-blue bg-ieee-blue/10"
-                  : "border-white/50 bg-black/30 hover:border-white/70"
+                  : "border-[#555] bg-black/30 hover:border-ieee-blue"
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -365,7 +342,7 @@ export default function AddNewEventPage() {
                 {photos.map((photo) => (
                   <div
                     key={photo.id}
-                    className="border-2 border-white/30 rounded-lg overflow-hidden bg-black/50"
+                    className="border-2 border-[#555] rounded-lg overflow-hidden bg-black/50"
                   >
                     {/* Preview Image */}
                     <div className="relative w-full h-40 bg-black flex items-center justify-center overflow-hidden">
@@ -426,17 +403,17 @@ export default function AddNewEventPage() {
                           updateAltText(photo.id, e.target.value)
                         }
                         placeholder="Alternative text"
-                        className="w-full rounded-md border border-white/50 bg-black text-white px-2 py-1 text-sm font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/40"
+                        className="w-full rounded-md border border-[#555] hover:border-ieee-blue bg-black text-white px-2 py-1 text-sm font-inter focus:ring-2 focus:ring-ieee-blue focus:border-ieee-blue placeholder-white/40 transition-colors"
                         disabled={photo.uploading}
                       />
-                      <Button
+                      <button
                         type="button"
                         onClick={() => removePhoto(photo.id)}
                         disabled={photo.uploading}
-                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-1 text-sm disabled:opacity-50"
+                        className="w-full rounded bg-red-600 hover:bg-red-700 text-white font-bold py-1 text-sm disabled:opacity-50 transition-colors"
                       >
                         Remove
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -451,21 +428,20 @@ export default function AddNewEventPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
-            <Button
+            <button
               type="button"
-              variant="outline"
               onClick={() => navigate("/admin/events")}
-              className="border-white text-white hover:bg-white/10 font-semibold uppercase text-lg px-8 py-3"
+              className="rounded-md bg-red-600 hover:bg-red-700 text-white font-semibold uppercase text-lg px-8 py-3 transition-colors"
             >
               Cancel
-            </Button>
-            <Button 
-              type="submit" 
+            </button>
+            <button
+              type="submit"
               disabled={form.formState.isSubmitting}
-              className="bg-ieee-blue hover:bg-ieee-blue/90 text-white font-semibold uppercase text-lg px-8 py-3"
+              className="rounded-md bg-ieee-blue hover:bg-ieee-blue/90 text-white font-semibold uppercase text-lg px-8 py-3 transition-colors disabled:opacity-50"
             >
               {form.formState.isSubmitting ? "Creating..." : "Create Event"}
-            </Button>
+            </button>
           </div>
         </form>
       </div>

@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
 
 const navLinks = [
-  { label: 'HACKATHON 2.0', to: '/hackathon' },
+  { label: 'HACKATHON 2.0', to: '/hackathon2' },
   { label: 'ABOUT US', to: '/about' },
   { label: 'EVENTS', to: '/events' },
-  { label: 'PODCASTS', to: '/podcasts' },
-  { label: 'CONTACT US', to: '/contact' },
+  { label: 'PODCASTS', to: '/podcasts' }
 ];
 
 // one source of truth for the “frosted” look

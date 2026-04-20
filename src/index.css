@@ -127,13 +127,50 @@ button:focus-visible {
 
 .slick-slide {
   opacity: 0.4;
-  transform: scale(0.9);
+  transform: scale(0.85);
   transition: all 0.3s ease-in-out;
 }
 
 .slick-center {
-  opacity: 1 !important;
-  transform: scale(1.05);
+  transform: scale(1);
+  opacity: 1;
+}
+
+/*.slick-slide {*/
+/*    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;*/
+/*    transform: scale(0.85); !* Shrinks the non-centered slides *!*/
+/*    opacity: 0.5; !* Dims the non-centered slides *!*/
+/*}*/
+
+/*.slick-center {*/
+/*    transform: scale(1); !* Brings the center slide to full size *!*/
+/*    opacity: 1; !* Makes the center slide fully visible *!*/
+/*}*/
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .group {
+    -webkit-mask-image: -webkit-radial-gradient(white, black); /* Force anti-aliasing */
+    mask-image: radial-gradient(white, black);
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+  }
+  
+  .group img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    image-rendering: -webkit-optimize-contrast; /* Better edge rendering */
+  }
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -webkit-backface-visibility: hidden;
+}
+
+.page-enter, .page-exit {
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 @theme inline {

@@ -40,9 +40,9 @@ export const EventPreviewCard: React.FC<Props> = ({ event }) => {
           <img
             src={previewPhoto.photoLink}
             alt={previewPhoto.alternativeText || event.title || "Event"}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-77 object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/57 to-transparent" />
           {/* IEEE Icon Overlay */}
           <div className="absolute top-4 right-4">
             <img src={ieeeSmallBlueIcon} alt="IEEE" className="w-12 h-12 opacity-90" />
