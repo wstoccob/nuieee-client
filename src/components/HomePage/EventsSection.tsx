@@ -17,17 +17,17 @@ export const EventsSection = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+
         const fetchEvents = async () => {
-            try {
-                setLoading(true);
-                // Use backend endpoint to get last 5 events
-                const data = await eventsApi.getLastEvents(5);
-                setEvents(data);
-            } catch (error) {
-                console.error('Failed to load events:', error);
-            } finally {
-                setLoading(false);
-            }
+             try {
+                 setLoading(true);
+                 const data = await eventsApi.getLastEvents(5);
+                 setEvents(data);
+             } catch (error) {
+                 console.error('Failed to load events:', error);
+             } finally {
+                 setLoading(false);
+             }
         };
         fetchEvents();
     }, []);
@@ -36,7 +36,7 @@ export const EventsSection = () => {
         <section className="bg-black text-white py-16 lg:py-24">
             <div className="container mx-auto px-4">
                 {/* Section Title */}
-                <h2 className="text-[clamp(60px,8vw,100px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-8">
+                <h2 className="text-[clamp(50px,7vw,83px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-8">
                     events
                 </h2>
 

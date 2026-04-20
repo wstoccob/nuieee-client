@@ -14,7 +14,7 @@ export function HeroSection() {
                     {/* The contents need to be lifted by 112/2=56 and lg:114/2=74 to place them at the center*/}
                     <img src={ieeeHeroSection} alt={'IEEE Hero Section'} className="block max-w-full h-auto m-0" />
 
-                    {/* Student Branch Text */}
+                    {/* Student Branch Text */} 
                     <div className="relative">
                         <div className="relative text-[30px] md:text-[50px] font-semibold uppercase leading-tight inline-block text-center">
                             {/* Multiple text layers for glow effect */}
