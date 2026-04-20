@@ -45,6 +45,11 @@ const boardMembers: BoardMember[] = [
         role: "PR Head",
         image: "https://minio.ieee.nu/static/board-members/Ruana_optimized_2000.jpg",
     },
+    {
+        name: "Madina Suleimenova",
+        role: "Event Head",
+        image: "https://minio.ieee.nu/static/board-members/Madina_optimized_2000.jpg",
+    },
 ];
 
 const BoardMembersSection = () => {
