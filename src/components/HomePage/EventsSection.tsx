@@ -16,66 +16,20 @@ export const EventsSection = () => {
     const [events, setEvents] = useState<EventDto[]>([]);
     const [loading, setLoading] = useState(true);
 
-   const dummyEvents: EventDto[] = [
-    {
-        id: "1",
-        title: "IEEE SPEED DATING",
-        eventDateTime: "2026-02-16T00:00:00Z",
-        description: "",
-        hasRegistrationLink: false,  // Add this
-        // Add any other required fields like:
-        // registrationLink?: string,
-        // location?: string,
-        // imageUrl?: string,
-    },
-    {
-        id: "2",
-        title: "MINECRAFT REDSTONE COMPETITION",
-        eventDateTime: "2026-02-07T00:00:00Z",
-        description: "",
-        hasRegistrationLink: false,
-    },
-    {
-        id: "3",
-        title: "ERASMUS MUNDUS EMIMEP WEBINAR",
-        eventDateTime: "2026-02-04T00:00:00Z",
-        description: "",
-        hasRegistrationLink: false,
-    },
-    {
-        id: "4",
-        title: "INFO SESSION: ELECTRICAL & COMPUTER ENGINEERING (ELCE)",
-        eventDateTime: "2026-01-26T00:00:00Z",
-        description: "",
-        hasRegistrationLink: false,
-    },
-    {
-        id: "5",
-        title: "RESEARCH ASSISTANT TALKS",
-        eventDateTime: "2025-10-27T00:00:00Z",
-        description: "",
-        hasRegistrationLink: false,
-    }
-];
-    // Then in your component, temporarily replace the API call:
     useEffect(() => {
-        // Comment out API call and use dummy data
-        setEvents(dummyEvents);
-        setLoading(false);
-        
-        // Original API call (comment out for testing)
-        // const fetchEvents = async () => {
-        //     try {
-        //         setLoading(true);
-        //         const data = await eventsApi.getLastEvents(5);
-        //         setEvents(data);
-        //     } catch (error) {
-        //         console.error('Failed to load events:', error);
-        //     } finally {
-        //         setLoading(false);
-        //     }
-        // };
-        // fetchEvents();
+
+        const fetchEvents = async () => {
+             try {
+                 setLoading(true);
+                 const data = await eventsApi.getLastEvents(5);
+                 setEvents(data);
+             } catch (error) {
+                 console.error('Failed to load events:', error);
+             } finally {
+                 setLoading(false);
+             }
+        };
+        fetchEvents();
     }, []);
 
     return (
