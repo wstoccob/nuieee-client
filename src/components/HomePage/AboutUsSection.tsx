@@ -3,7 +3,7 @@
         <section className="bg-black text-white py-16 lg:py-24">
             <div className="container mx-auto px-4">
                 {/* Section Title */}
-                <h2 className="text-[clamp(60px,8vw,100px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-8">
+                <h2 className="text-[clamp(50px,7vw,83px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-8">
                     about us
                 </h2>
 

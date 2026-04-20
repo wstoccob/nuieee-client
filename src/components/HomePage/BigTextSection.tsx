@@ -35,7 +35,7 @@ export const BigTextSection = () => {
                             delay: idx * 0.15,
                         }}
                         style={{
-                            fontSize: 'clamp(2.5rem, 10vw, 8rem)',
+                            fontSize: 'clamp(2.5rem, 5.vw, 8rem)',
                             lineHeight: 1.05,
                         }}
                     >

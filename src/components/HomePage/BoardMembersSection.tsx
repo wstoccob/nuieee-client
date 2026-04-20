@@ -109,7 +109,7 @@ const BoardMembersSection = () => {
     return (
         <section className="bg-black text-white pt-36 pb-16 lg:pt-44 lg:pb-24 overflow-hidden">
             <div className="container mx-auto px-4">
-                <h2 className="text-[clamp(60px,8vw,96px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-12">
+                <h2 className="text-[clamp(50px,7vw,83px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-12">
                     board members
                 </h2>
                 {/* Wrapped the slider in a div to catch wheel events */}
@@ -117,7 +117,7 @@ const BoardMembersSection = () => {
                     <Slider ref={sliderRef} {...settings}>
                         {boardMembers.map((member, idx) => (
                             <div key={idx} className="w-full px-2 cursor-grab active:cursor-grabbing">
-                                <div className="w-full aspect-[3/4] rounded-[20px] overflow-hidden mb-6 shadow-xl pointer-events-none">
+                                <div className="w-90/100 mx-auto aspect-[3/4] rounded-[20px] overflow-hidden mb-6 shadow-xl pointer-events-none">
                                     <img
                                         src={member.image}
                                         alt={member.name}
@@ -126,10 +126,10 @@ const BoardMembersSection = () => {
                                     />
                                 </div>
                                 <div className="text-center mb-8">
-                                    <div className="text-ieee-blue font-inter text-[38px] font-normal mb-1">
+                                    <div className="text-ieee-blue font-inter text-[33px] font-normal mb-1">
                                         {member.role}
                                     </div>
-                                    <div className="text-white font-inter text-[36px] font-bold">
+                                    <div className="text-white font-inter text-[30px] font-bold">
                                         {member.name}
                                     </div>
                                 </div>
