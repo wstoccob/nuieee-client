@@ -4,7 +4,7 @@ import youtubeIcon from '../../../assets/icons/white logos/youtube-white.png';
 import instagramIcon from '../../../assets/icons/white logos/instagram-white.png';
 import tiktokIcon from '../../../assets/icons/white logos/tiktok-white.png';
 import telegramIcon from '../../../assets/icons//white logos/telegram-white.png';
-import ieeeLogo from '../../../assets/icons/ieee_logo.svg';
+import ieeeLogo from '../../../assets/icons/white logos/IEEE_logo_white.svg';
 
 export default function Component() {
     return (
@@ -81,7 +81,7 @@ export default function Component() {
                     <img src={ieeeLogo} alt={"Ieee Logo"} className="mb-4 md:mb-0" />
 
                     {/* Copyright */}
-                    <div className="text-black">
+                    <div className="text-gray-300">
                         <div className="font-semibold mb-1">© 2025 IEEE Student Branch</div>
                         <div className="text-sm">Nazarbayev University, 53 Kabanbay Batyr Avenue, Astana, Kazakhstan.</div>
                     </div>
