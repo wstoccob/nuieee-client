@@ -1,4 +1,4 @@
-import type { EventDto } from "@/dtos/Events/EventDto";
+import type { Event } from "@/dtos/event";
 const formatDateTime = (iso: string) => {
   const d = new Date(iso);
   return d.toLocaleString(undefined, {
@@ -10,7 +10,7 @@ import ieeeSmallBlueIcon from "@/assets/icons/ieee_small_blue_icon.svg";
 import { Button } from "@/components/ui/button";
 
 interface Props {
-  event: EventDto;
+  event: Event;
 }
 
 export const BaseEventPage: React.FC<Props> = ({ event }) => {
@@ -25,7 +25,7 @@ export const BaseEventPage: React.FC<Props> = ({ event }) => {
           <div className="flex items-center gap-4 mb-8">
             <img src={ieeeSmallBlueIcon} alt="IEEE" className="w-12 h-12 md:w-16 md:h-16" />
             <p className="text-white text-[clamp(18px,2.5vw,30px)] font-inter font-semibold">
-              {formatDateTime(event.eventDateTime)}
+              {formatDateTime(event.startsAt)}
             </p>
           </div>
           {event.registrationLink && (
@@ -65,16 +65,16 @@ export const BaseEventPage: React.FC<Props> = ({ event }) => {
                   key={p.id}
                   className="bg-black rounded-lg overflow-hidden border-2 border-white hover:border-ieee-blue transition-colors duration-300"
                 >
-                  {p.photoLink && (
+                  {p.photoUrl && (
                     <img
-                      src={p.photoLink}
-                      alt={p.alternativeText || "Event photo"}
+                      src={p.photoUrl}
+                      alt={p.altText || "Event photo"}
                       className="w-full h-64 object-cover"
                     />
                   )}
-                  {p.alternativeText && (
+                  {p.altText && (
                     <figcaption className="text-white/80 text-sm font-inter p-3">
-                      {p.alternativeText}
+                      {p.altText}
                     </figcaption>
                   )}
                 </figure>

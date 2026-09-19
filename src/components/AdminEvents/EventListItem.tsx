@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
-import type { EventDto } from "@/dtos/Events/EventDto";
+import type { Event } from "@/dtos/event";
 // Lightweight date formatting (avoid extra dependency)
 const formatDateTime = (iso: string) => {
   const d = new Date(iso);
@@ -11,7 +11,7 @@ const formatDateTime = (iso: string) => {
 };
 
 interface Props {
-  event: EventDto;
+  event: Event;
   onDelete: (id: string) => void;
   deleting?: boolean;
 }
@@ -29,7 +29,7 @@ export const EventListItem: React.FC<Props> = ({ event, onDelete, deleting }) =>
           {event.title || "Untitled Event"}
         </h3>
         <p className="text-ieee-blue text-lg md:text-xl font-semibold mb-3">
-          {formatDateTime(event.eventDateTime)}
+          {formatDateTime(event.startsAt)}
         </p>
         {event.description && (
           <p className="text-white/80 text-base md:text-lg line-clamp-2">
