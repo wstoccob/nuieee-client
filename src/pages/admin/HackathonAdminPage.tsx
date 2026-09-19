@@ -1,3 +1,4 @@
+import { errorMessage } from "@/api/client";
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { hackathonApi } from '@/api/hackathonApi';
@@ -20,8 +21,8 @@ export default function HackathonAdminPage() {
             setLoading(true);
             const data = await hackathonApi.getHackathonTeams();
             setTeams(data);
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to fetch teams');
+        } catch (err) {
+            setError(errorMessage(err, 'Failed to fetch teams'));
         } finally {
             setLoading(false);
         }

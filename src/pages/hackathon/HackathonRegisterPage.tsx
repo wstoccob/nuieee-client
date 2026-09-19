@@ -1,3 +1,4 @@
+import { errorMessage } from "@/api/client";
 import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -65,8 +66,8 @@ export default function HackathonRegisterPage() {
             await hackathonApi.registerTeam(data);
             setSubmitSuccess(true);
             reset();
-        } catch (error: any) {
-            setSubmitError(error.response?.data?.message || 'Registration failed. Please try again.');
+        } catch (error) {
+            setSubmitError(errorMessage(error, 'Registration failed. Please try again.'));
         } finally {
             setIsSubmitting(false);
         }
