@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import imageCompression from "browser-image-compression";
 import { toast } from "sonner";
 import { storageApi } from "@/api/storage";
 import type { EventPhotoInput } from "@/dtos/event";
@@ -11,11 +12,64 @@ export interface PendingPhoto {
   file: File;
   preview: string;
   altText: string;
+  status: "compressing" | "ready";
+  originalSize: number;
+  compressedSize?: number;
 }
+
+const COMPRESSION_OPTIONS = {
+  maxSizeMB: 0.5,             // Цель: ~500 KB на фото
+  maxWidthOrHeight: 1920,     // Макс. разрешение 1920px по длинной стороне
+  initialQuality: 0.8,        // Качество около 80%
+  useWebWorker: true,         // Сжатие в фоновом потоке (интерфейс не зависает)
+  preserveExif: false,        // Удаляет GPS/приватность, сохраняя ориентацию
+};
 
 export function usePhotoUploads() {
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
   const [uploading, setUploading] = useState(false);
+
+  const compressSingleFile = async (id: string, file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setPhotos((current) =>
+        current.map((p) =>
+          p.id === id ? { ...p, status: "ready", compressedSize: file.size } : p
+        )
+      );
+      return;
+    }
+
+    try {
+      const compressedBlob = await imageCompression(file, COMPRESSION_OPTIONS);
+      const compressedFile = new File([compressedBlob], file.name, {
+        type: compressedBlob.type || file.type,
+        lastModified: Date.now(),
+      });
+
+      // Правило: никогда не загружать файл больше оригинала
+      const finalFile = compressedFile.size < file.size ? compressedFile : file;
+
+      setPhotos((current) =>
+        current.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                file: finalFile,
+                status: "ready",
+                compressedSize: finalFile.size,
+              }
+            : p
+        )
+      );
+    } catch (error) {
+      console.error("Compression failed, using original:", error);
+      setPhotos((current) =>
+        current.map((p) =>
+          p.id === id ? { ...p, status: "ready", compressedSize: file.size } : p
+        )
+      );
+    }
+  };
 
   const addFiles = useCallback((files: FileList | null) => {
     if (!files) return;
@@ -26,6 +80,8 @@ export function usePhotoUploads() {
       return false;
     });
 
+    if (valid.length === 0) return;
+
     setPhotos((current) => {
       const availableSlots = Math.max(0, MAX_PHOTOS - current.length);
       if (valid.length > availableSlots) {
@@ -33,13 +89,23 @@ export function usePhotoUploads() {
           `Maximum ${MAX_PHOTOS} photos allowed. Only adding the first ${availableSlots}.`
         );
       }
-      const accepted = valid.slice(0, availableSlots).map((file) => ({
-        id: crypto.randomUUID(),
-        file,
-        preview: URL.createObjectURL(file),
-        altText: "",
-      }));
-      return [...current, ...accepted];
+      const accepted = valid.slice(0, availableSlots);
+
+      const newItems: PendingPhoto[] = accepted.map((file) => {
+        const id = crypto.randomUUID();
+        compressSingleFile(id, file);
+
+        return {
+          id,
+          file,
+          preview: URL.createObjectURL(file),
+          altText: "",
+          status: "compressing",
+          originalSize: file.size,
+        };
+      });
+
+      return [...current, ...newItems];
     });
   }, []);
 
@@ -57,12 +123,6 @@ export function usePhotoUploads() {
     );
   }, []);
 
-  /**
-   * Upload every pending photo and return them as event payload entries.
-   *
-   * Each result keeps its own altText rather than being re-indexed against a
-   * filtered array, which previously misaligned captions when an upload failed.
-   */
   const uploadAll = useCallback(async (): Promise<EventPhotoInput[]> => {
     if (photos.length === 0) return [];
 
@@ -80,5 +140,13 @@ export function usePhotoUploads() {
     }
   }, [photos]);
 
-  return { photos, uploading, addFiles, removePhoto, setAltText, uploadAll, MAX_PHOTOS };
+  return {
+    photos,
+    uploading,
+    addFiles,
+    removePhoto,
+    setAltText,
+    uploadAll,
+    MAX_PHOTOS,
+  };
 }
