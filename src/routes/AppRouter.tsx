@@ -1,5 +1,6 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { PageNotFound } from "@/components/PageNotFound";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/auth/LoginPage";
 import EventsListPage from "@/pages/event/EventsListPage";
@@ -45,6 +46,8 @@ export const AppRouter = () => (
         <Route element={<ProtectedRoute minimumRole="superadmin" />}>
           <Route path="/superadmin" element={<SuperAdminPage />} />
         </Route>
+
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Suspense>
   </BrowserRouter>

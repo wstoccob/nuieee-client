@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import "./index.css";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppRouter } from "./routes/AppRouter";
 import { AuthProvider } from "./auth/AuthContext";
 
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <AppRouter />
+        <ErrorBoundary>
+          <AppRouter />
+        </ErrorBoundary>
         <Toaster richColors position="top-right" />
       </AuthProvider>
     </QueryClientProvider>
