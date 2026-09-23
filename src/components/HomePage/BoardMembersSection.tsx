@@ -84,7 +84,7 @@ const BoardMembersSection = () => {
                 }`}
             />
         ),
-        appendDots: (dots: any) => (
+        appendDots: (dots: React.ReactNode) => (
             <div className="flex justify-center mt-6">{dots}</div>
         ),
         responsive: [

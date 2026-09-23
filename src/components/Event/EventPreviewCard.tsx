@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { EventDto } from "@/dtos/Events/EventDto";
+import type { Event } from "@/dtos/event";
 import ieeeSmallBlueIcon from "@/assets/icons/ieee_small_blue_icon.svg";
 
 const formatDateTime = (iso: string) => {
@@ -11,7 +11,7 @@ const formatDateTime = (iso: string) => {
 };
 
 interface Props {
-  event: EventDto;
+  event: Event;
 }
 
 export const EventPreviewCard: React.FC<Props> = ({ event }) => {
@@ -35,11 +35,11 @@ export const EventPreviewCard: React.FC<Props> = ({ event }) => {
       className="group cursor-pointer bg-black border-2 border-white rounded-lg overflow-hidden hover:border-ieee-blue transition-all duration-300 hover:scale-[1.02]"
     >
       {/* Image Section */}
-      {previewPhoto?.photoLink ? (
+      {previewPhoto?.photoUrl ? (
         <div className="relative h-64 md:h-80 overflow-hidden">
           <img
-            src={previewPhoto.photoLink}
-            alt={previewPhoto.alternativeText || event.title || "Event"}
+            src={previewPhoto.photoUrl}
+            alt={previewPhoto.altText || event.title || "Event"}
             className="w-full h-77 object-cover group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/57 to-transparent" />
@@ -60,7 +60,7 @@ export const EventPreviewCard: React.FC<Props> = ({ event }) => {
         <div className="flex items-center gap-2 mb-4">
           <div className="w-2 h-2 bg-ieee-blue rounded-full"></div>
           <p className="text-ieee-blue text-sm md:text-base font-semibold uppercase tracking-wide">
-            {formatDateTime(event.eventDateTime)}
+            {formatDateTime(event.startsAt)}
           </p>
         </div>
 

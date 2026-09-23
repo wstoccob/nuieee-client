@@ -1,4 +1,4 @@
-import axiosInstance from '../services/axiosInstance';
+import axiosInstance from './client';
 import type {RegisterTeamCommand} from '../dtos/Hackathon/HackathonTeam';
 
 export const hackathonApi = {

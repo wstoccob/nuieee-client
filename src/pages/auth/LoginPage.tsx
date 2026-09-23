@@ -1,6 +1,8 @@
-﻿import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { login } from "../../api/authApi.ts";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { authApi } from "@/api/auth";
+import { errorMessage } from "@/api/client";
+import { useAuth } from "@/auth/useAuth";
 import IEEE_mainscreen from '../../assets/icons/IEEE_mainscreen.svg';
 
 const LoginPage = () => {
@@ -11,6 +13,8 @@ const LoginPage = () => {
     const [rememberMe, setRememberMe] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const { login } = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,17 +23,13 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            const { token } = await login({ username, password });
+            const { accessToken } = await authApi.login(username, password);
+            login(accessToken, rememberMe);
 
-            if (rememberMe) {
-                localStorage.setItem("token", token);
-            } else {
-                sessionStorage.setItem("token", token);
-            }
-
-            navigate("/admin");
-        } catch {
-            setError("Invalid username or password");
+            const from = (location.state as { from?: Location })?.from?.pathname;
+            navigate(from ?? "/admin", { replace: true });
+        } catch (err) {
+            setError(errorMessage(err, "Invalid username or password"));
         } finally {
             setIsLoading(false);
         }

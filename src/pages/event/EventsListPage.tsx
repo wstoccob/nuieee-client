@@ -1,41 +1,25 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { MainLayout } from "@/components/Layouts/MainLayout/MainLayout";
-import eventsApi from "@/api/eventsApi";
-import type { EventDto } from "@/dtos/Events/EventDto";
+import { useEvents } from "@/hooks/useEvents";
+import { errorMessage } from "@/api/client";
 import { EventPreviewCard } from "@/components/Event/EventPreviewCard";
+import { EventsError, EventsSpinner } from "@/components/Event/EventsState";
 
 export default function EventsListPage() {
-  const [events, setEvents] = useState<EventDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: events = [], isPending, error } = useEvents();
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        const data = await eventsApi.getEvents();
-        // Sort by date descending (newest first)
-        const sorted = [...data].sort(
-          (a, b) => new Date(b.eventDateTime).getTime() - new Date(a.eventDateTime).getTime()
-        );
-        setEvents(sorted);
-      } catch (e: any) {
-        setError(e?.response?.data?.message || "Failed to load events");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
-
-  const now = new Date();
-  const filteredEvents = events.filter((event) => {
-    const eventDate = new Date(event.eventDateTime);
-    if (filter === "upcoming") return eventDate >= now;
-    if (filter === "past") return eventDate < now;
-    return true;
-  });
+  const filteredEvents = useMemo(() => {
+    const now = Date.now();
+    const sorted = [...events].sort(
+      (a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime()
+    );
+    if (filter === "all") return sorted;
+    return sorted.filter((event) => {
+      const starts = new Date(event.startsAt).getTime();
+      return filter === "upcoming" ? starts >= now : starts < now;
+    });
+  }, [events, filter]);
 
   return (
     <MainLayout>
@@ -85,23 +69,12 @@ export default function EventsListPage() {
             </button>
           </div>
 
-          {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center py-32">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-ieee-blue" />
-            </div>
-          )}
+          {isPending && <EventsSpinner />}
 
-          {/* Error State */}
-          {error && !loading && (
-            <div className="bg-red-900/30 border-2 border-red-500 text-red-400 p-8 rounded-lg mb-8">
-              <h3 className="text-2xl font-bold mb-2">Error Loading Events</h3>
-              <p className="text-lg">{error}</p>
-            </div>
-          )}
+          {error && <EventsError message={errorMessage(error, "Failed to load events")} />}
 
           {/* Empty State */}
-          {!loading && !error && filteredEvents.length === 0 && (
+          {!isPending && !error && filteredEvents.length === 0 && (
             <div className="text-center py-32 border-2 border-dashed border-white/30 rounded-lg">
               <p className="text-white text-2xl font-inter font-bold mb-4">
                 {filter === "upcoming" && "No upcoming events scheduled."}
@@ -113,7 +86,7 @@ export default function EventsListPage() {
           )}
 
           {/* Events Grid */}
-          {!loading && !error && filteredEvents.length > 0 && (
+          {!isPending && !error && filteredEvents.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredEvents.map((event) => (
                 <EventPreviewCard key={event.id} event={event} />

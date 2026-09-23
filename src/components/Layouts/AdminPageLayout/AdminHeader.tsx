@@ -1,20 +1,21 @@
 ﻿import { Link, useNavigate } from 'react-router-dom';
-import {useAuth} from "../../../services/useAuth.ts";
+import { useAuth } from "@/auth/useAuth";
 import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
 
 const adminNavLinks = [
     { label: 'Events', to: '/admin/events' },
-    { label: 'News', to: '/admin/news' },
-    { label: 'Hackathon', to: '/admin/hackathon' },
 ];
 
 const AdminHeader = () => {
-    const { user, logout} = useAuth();
-
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
-    const redirectToLoginPage = () => {
-        navigate('../auth/login');
-    }
+
+    const redirectToLoginPage = () => navigate('/auth/login');
+
+    const handleLogout = () => {
+        logout();
+        navigate('/auth/login', { replace: true });
+    };
 
     return (
         <header className="w-full bg-black flex justify-center">
@@ -43,7 +44,7 @@ const AdminHeader = () => {
                     {/* Login/Logout */}
                     <div className="ml-auto">
                         {user ? (
-                            <button onClick={logout} className="text-white text-sm md:text-lg lg:text-[22px] font-bold font-inter  transition-colors">
+                            <button onClick={handleLogout} className="text-white text-sm md:text-lg lg:text-[22px] font-bold font-inter  transition-colors">
                                 Log out
                             </button>
                         ) : (
