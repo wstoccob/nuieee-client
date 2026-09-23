@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { PageNotFound } from '../components/PageNotFound'
 import HomePage from '../pages/HomePage'
 import LoginPage from '../pages/auth/LoginPage.tsx'
 import SuperAdminPage from '../pages/superadmin/SuperAdminPage.tsx'
@@ -28,6 +29,7 @@ export const AppRouter = () => {
                 <Route path="/events" element={<EventsListPage />} />
                 <Route path="/events/:id" element={<EventDetailPage />} />
                 <Route path="/podcasts" element={<PodcastsPage />} />
+                <Route path="*" element={<PageNotFound />} />
             </Routes>
         </BrowserRouter>
     )
