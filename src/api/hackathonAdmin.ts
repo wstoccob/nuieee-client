@@ -9,6 +9,7 @@ import type {
   PostUploadTarget,
   UploadConfirm,
   UploadRequest,
+  AccessTokenIssued,
 } from "@/dtos/hackathon";
 
 export const hackathonAdminApi = {
@@ -90,11 +91,11 @@ export const hackathonAdminApi = {
     return data;
   },
 
-  async rotateTeamToken(teamId: string): Promise<string> {
-    const { data } = await client.post<{ accessToken: string }>(
+  async rotateTeamToken(teamId: string): Promise<AccessTokenIssued> {
+    const { data } = await client.post<AccessTokenIssued>(
       `/admin/teams/${teamId}/access-token`
     );
-    return data.accessToken;
+    return data;
   },
 
   async deleteTeam(teamId: string): Promise<void> {

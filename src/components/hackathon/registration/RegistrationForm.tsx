@@ -21,6 +21,7 @@ export interface Registered {
   token: string;
   teamName: string;
   memberEmails: string[];
+  linkEmailed: boolean;
 }
 
 interface RegistrationFormProps {
@@ -69,6 +70,7 @@ export function RegistrationForm({ event, onRegistered }: RegistrationFormProps)
         token: result.accessToken,
         teamName: values.teamName.trim(),
         memberEmails: values.members.map((member) => member.email.trim()),
+        linkEmailed: result.linkEmailed,
       });
     } catch (error) {
       const message = errorMessage(error, "Registration failed. Please check your connection and try again.");

@@ -1,7 +1,12 @@
+// The interface is written in English, so dates must be too. Leaving this to the
+// browser produced Russian month names next to English copy for many participants.
+// The time zone is still the visitor's own.
+const LOCALE = "en-GB";
+
 const sameYear = (date: Date) => date.getFullYear() === new Date().getFullYear();
 
 function dateTimeFormat(date: Date, withWeekday = true) {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(LOCALE, {
     weekday: withWeekday ? "short" : undefined,
     day: "numeric",
     month: "short",
@@ -18,7 +23,7 @@ export function formatDateTime(iso: string): string {
 
 export function formatDate(iso: string): string {
   const date = new Date(iso);
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(LOCALE, {
     day: "numeric",
     month: "short",
     year: sameYear(date) ? undefined : "numeric",
@@ -34,7 +39,7 @@ export function formatDateTimeRange(startIso: string, endIso: string): string {
 export function formatDateRange(startIso: string, endIso: string): string {
   const start = new Date(startIso);
   const end = new Date(endIso);
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(LOCALE, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -49,7 +54,7 @@ const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
 
 export function formatRelative(iso: string, now = Date.now()): string {
   const diff = new Date(iso).getTime() - now;
-  const format = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+  const format = new Intl.RelativeTimeFormat(LOCALE, { numeric: "auto" });
   for (const [unit, ms] of RELATIVE_UNITS) {
     if (Math.abs(diff) >= ms) return format.format(Math.round(diff / ms), unit);
   }

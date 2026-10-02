@@ -118,6 +118,13 @@ export interface TeamRegistration {
 export interface RegistrationResult {
   teamId: string;
   accessToken: string;
+  /** True when the server queued an email with the link to every member. */
+  linkEmailed: boolean;
+}
+
+export interface AccessTokenIssued {
+  accessToken: string;
+  linkEmailed: boolean;
 }
 
 export interface PostUploadTarget {

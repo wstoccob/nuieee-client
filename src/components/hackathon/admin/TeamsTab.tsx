@@ -149,7 +149,7 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [toRotate, setToRotate] = useState<AdminTeam | null>(null);
   const [toDelete, setToDelete] = useState<AdminTeam | null>(null);
-  const [newLink, setNewLink] = useState<{ team: AdminTeam; token: string } | null>(null);
+  const [newLink, setNewLink] = useState<{ team: AdminTeam; token: string; emailed: boolean } | null>(null);
   const [exporting, setExporting] = useState(false);
 
   const filtered = useMemo(() => {
@@ -177,8 +177,8 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
   const confirmRotate = async () => {
     if (!toRotate) return;
     try {
-      const token = await rotate.mutateAsync(toRotate.id);
-      setNewLink({ team: toRotate, token });
+      const issued = await rotate.mutateAsync(toRotate.id);
+      setNewLink({ team: toRotate, token: issued.accessToken, emailed: issued.linkEmailed });
       setToRotate(null);
     } catch (err) {
       toast.error(errorMessage(err, "Couldn't create a new link."));
@@ -282,7 +282,11 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
       <Dialog
         open={newLink !== null}
         title={`New link for ${newLink?.team.name ?? ""}`}
-        description="This is the only time it's shown. Send it to the team now. The old link no longer works."
+        description={
+          newLink?.emailed
+            ? "We emailed it to every member. The old link no longer works, and this is the only time it's shown here."
+            : "This is the only time it's shown. Send it to the team now. The old link no longer works."
+        }
         onClose={() => setNewLink(null)}
         footer={<Button onClick={() => setNewLink(null)}>Done</Button>}
       >

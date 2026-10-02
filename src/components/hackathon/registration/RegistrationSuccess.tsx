@@ -12,7 +12,7 @@ interface RegistrationSuccessProps {
 }
 
 export function RegistrationSuccess({ eventTitle, registered }: RegistrationSuccessProps) {
-  const { token, teamName, memberEmails } = registered;
+  const { token, teamName, memberEmails, linkEmailed } = registered;
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -31,6 +31,13 @@ export function RegistrationSuccess({ eventTitle, registered }: RegistrationSucc
           </p>
         </div>
       </div>
+
+      {linkEmailed && (
+        <Alert tone="success" title="We emailed this link to your team">
+          Every member ({memberEmails.length}) should get it within a few minutes. If it isn't there, check
+          the spam folder, and save the link below anyway.
+        </Alert>
+      )}
 
       <Card className="border-hk-accent-fg/30 bg-hk-accent/[0.07]">
         <h2 className="text-lg font-semibold text-white">Your team link</h2>
