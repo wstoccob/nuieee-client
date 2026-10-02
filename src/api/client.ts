@@ -24,8 +24,10 @@ export function clearStoredToken(): void {
   sessionStorage.removeItem(TOKEN_KEY);
 }
 
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.ieee.nu/api";
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "https://api.ieee.nu/api",
+  baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -56,6 +58,10 @@ export function errorMessage(error: unknown, fallback: string): string {
     if (typeof detail === "string") return detail;
   }
   return fallback;
+}
+
+export function errorStatus(error: unknown): number | undefined {
+  return axios.isAxiosError(error) ? error.response?.status : undefined;
 }
 
 export default client;
