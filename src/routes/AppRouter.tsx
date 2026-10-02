@@ -12,6 +12,9 @@ import { ProtectedRoute } from "./ProtectedRoute";
 const AdminMainPage = lazy(() => import("@/pages/admin/AdminMainPage"));
 const AdminEventsPage = lazy(() => import("@/pages/admin/AdminEventsPage"));
 const AddNewEventPage = lazy(() => import("@/pages/admin/AddNewEventPage"));
+const AdminHackathonsPage = lazy(() => import("@/pages/admin/hackathons/AdminHackathonsPage"));
+const AdminHackathonNewPage = lazy(() => import("@/pages/admin/hackathons/AdminHackathonNewPage"));
+const AdminHackathonDetailPage = lazy(() => import("@/pages/admin/hackathons/AdminHackathonDetailPage"));
 const SuperAdminPage = lazy(() => import("@/pages/superadmin/SuperAdminPage"));
 const HackathonIndexPage = lazy(() => import("@/pages/hackathon/HackathonIndexPage"));
 const HackathonEventPage = lazy(() => import("@/pages/hackathon/HackathonEventPage"));
@@ -46,6 +49,9 @@ export const AppRouter = () => (
           <Route path="/admin" element={<AdminMainPage />} />
           <Route path="/admin/events" element={<AdminEventsPage />} />
           <Route path="/admin/events/addNewEvent" element={<AddNewEventPage />} />
+          <Route path="/admin/hackathons" element={<AdminHackathonsPage />} />
+          <Route path="/admin/hackathons/new" element={<AdminHackathonNewPage />} />
+          <Route path="/admin/hackathons/:id" element={<AdminHackathonDetailPage />} />
         </Route>
 
         <Route element={<ProtectedRoute minimumRole="superadmin" />}>

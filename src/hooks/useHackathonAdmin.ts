@@ -159,6 +159,7 @@ export function useDeleteTeam(eventId: string) {
     mutationFn: (teamId: string) => hackathonAdminApi.deleteTeam(teamId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: teamsKey(eventId) });
+      queryClient.invalidateQueries({ queryKey: eventKey(eventId), exact: true });
       queryClient.invalidateQueries({ queryKey: ADMIN_EVENTS_KEY, exact: true });
     },
   });
