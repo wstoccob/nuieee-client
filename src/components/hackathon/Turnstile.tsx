@@ -4,6 +4,7 @@ interface TurnstileOptions {
   sitekey: string;
   theme: "dark" | "light" | "auto";
   appearance: "always" | "execute" | "interaction-only";
+  action: string;
   callback: (token: string) => void;
   "expired-callback": () => void;
   "error-callback": () => void;
@@ -21,6 +22,8 @@ declare global {
   }
 }
 
+// The API rejects tokens issued for any other action, so this must match it exactly.
+const ACTION = "hackathon-register";
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 let scriptLoading: Promise<TurnstileApi> | null = null;
 
@@ -67,6 +70,7 @@ export function Turnstile({ siteKey, resetKey, onToken }: TurnstileProps) {
           sitekey: siteKey,
           theme: "dark",
           appearance: "interaction-only",
+          action: ACTION,
           callback: (token) => {
             setFailed(false);
             onTokenRef.current(token);
