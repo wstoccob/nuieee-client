@@ -1,32 +1,25 @@
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import AdminHeader from "@/components/Layouts/AdminPageLayout/AdminHeader";
-import { Button } from "@/components/ui/button";
-import { EventFormField, fieldClassName } from "@/components/AddEvent/EventFormField";
-import { PhotoDropzone } from "@/components/AddEvent/PhotoDropzone";
+import { EventForm } from "@/components/AddEvent/EventForm";
+import {
+  eventFormSchema,
+  type EventFormValues,
+} from "@/components/AddEvent/eventFormSchema";
 import { usePhotoUploads } from "@/hooks/usePhotoUploads";
 import { useCreateEvent } from "@/hooks/useEvents";
 import { errorMessage } from "@/api/client";
-
-const schema = z.object({
-  title: z.string().min(2, "Title too short").max(200),
-  description: z.string().min(10, "Description too short").max(5000),
-  startsAt: z.string().min(1, "Event date and time is required"),
-  registrationLink: z.union([z.string().url("Invalid URL"), z.literal("")]),
-});
-
-type FormValues = z.infer<typeof schema>;
+import { fromDatetimeLocal } from "@/lib/eventDateTime";
 
 export default function AddNewEventPage() {
   const navigate = useNavigate();
   const createEvent = useCreateEvent();
   const uploads = usePhotoUploads();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(eventFormSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -35,7 +28,7 @@ export default function AddNewEventPage() {
     },
   });
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: EventFormValues) => {
     const toastId = toast.loading("Processing event...");
     try {
       if (uploads.photos.length > 0) {
@@ -45,7 +38,7 @@ export default function AddNewEventPage() {
       const created = await createEvent.mutateAsync({
         title: values.title,
         description: values.description,
-        startsAt: new Date(values.startsAt).toISOString(),
+        startsAt: fromDatetimeLocal(values.startsAt),
         registrationLink: values.registrationLink || null,
         photos,
       });
@@ -57,8 +50,6 @@ export default function AddNewEventPage() {
   };
 
   const busy = uploads.uploading || createEvent.isPending;
-  const { errors } = form.formState;
-
   return (
     <div className="min-h-screen bg-black">
       <AdminHeader />
@@ -67,80 +58,21 @@ export default function AddNewEventPage() {
           add new event
         </h1>
 
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="max-w-4xl space-y-8 bg-black border-2 border-[#555] rounded-lg shadow-2xl p-8 md:p-12"
-        >
-          <EventFormField label="Title" error={errors.title?.message}>
-            <input
-              type="text"
-              {...form.register("title")}
-              className={fieldClassName}
-              placeholder="Amazing Engineering Podcast"
-            />
-          </EventFormField>
-
-          <EventFormField label="Event Date & Time" error={errors.startsAt?.message}>
-            <input
-              type="datetime-local"
-              {...form.register("startsAt")}
-              className={`${fieldClassName} [color-scheme:dark]`}
-            />
-          </EventFormField>
-
-          <EventFormField
-            label="Registration Link (Optional)"
-            error={errors.registrationLink?.message}
-          >
-            <input
-              type="url"
-              {...form.register("registrationLink")}
-              className={fieldClassName}
-              placeholder="https://"
-            />
-          </EventFormField>
-
-          <EventFormField label="Description" error={errors.description?.message}>
-            <textarea
-              rows={6}
-              {...form.register("description")}
-              className={fieldClassName}
-              placeholder="Describe the event..."
-            />
-          </EventFormField>
-
-          <PhotoDropzone
-            photos={uploads.photos}
-            maxPhotos={uploads.MAX_PHOTOS}
-            disabled={busy}
-            onAdd={uploads.addFiles}
-            onRemove={uploads.removePhoto}
-            onAltTextChange={uploads.setAltText}
-          />
-
-          <div className="flex gap-4">
-            <Button
-              type="submit"
-              disabled={busy}
-              className="bg-ieee-blue hover:bg-ieee-blue/90 text-white font-semibold text-lg px-8 py-6 h-auto rounded-md uppercase"
-            >
-              {uploads.uploading
-                ? "Uploading photos..."
-                : createEvent.isPending
-                  ? "Creating..."
-                  : "Create Event"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={busy}
-              onClick={() => navigate("/admin/events")}
-              className="border-[#555] text-black font-semibold text-lg px-8 py-6 h-auto rounded-md uppercase"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+        <EventForm
+          form={form}
+          onSubmit={onSubmit}
+          photos={uploads.photos}
+          maxPhotos={uploads.MAX_PHOTOS}
+          busy={busy}
+          uploading={uploads.uploading}
+          saving={createEvent.isPending}
+          submitLabel="Create Event"
+          savingLabel="Creating..."
+          onAddPhotos={uploads.addFiles}
+          onRemovePhoto={uploads.removePhoto}
+          onAltTextChange={uploads.setAltText}
+          onCancel={() => navigate("/admin/events")}
+        />
       </div>
     </div>
   );

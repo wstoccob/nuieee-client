@@ -20,6 +20,7 @@ export const EventListItem: React.FC<Props> = ({ event, onDelete, deleting }) =>
   const navigate = useNavigate();
 
   const handleOpen = () => navigate(`/events/${event.id}`);
+  const handleEdit = () => navigate(`/admin/events/${event.id}/edit`);
   const handleDelete = () => onDelete(event.id);
 
   return (
@@ -41,9 +42,16 @@ export const EventListItem: React.FC<Props> = ({ event, onDelete, deleting }) =>
         <Button 
           variant="outline" 
           onClick={handleOpen}
-          className="border-ieee-blue text-ieee-blue hover:bg-ieee-blue hover:text-white font-semibold uppercase px-6 py-2"
+          className="border-ieee-blue text-ieee-blue hover:bg-ieee-blue hover:text-black font-semibold uppercase px-6 py-2"
         >
           View
+        </Button>
+        <Button
+          variant="outline"
+          onClick={handleEdit}
+          className="border-ieee-blue text-ieee-blue hover:bg-ieee-blue hover:text-black font-semibold uppercase px-6 py-2"
+        >
+          Edit
         </Button>
         <Button
           onClick={handleDelete}

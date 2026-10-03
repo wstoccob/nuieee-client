@@ -12,6 +12,7 @@ import { ProtectedRoute } from "./ProtectedRoute";
 const AdminMainPage = lazy(() => import("@/pages/admin/AdminMainPage"));
 const AdminEventsPage = lazy(() => import("@/pages/admin/AdminEventsPage"));
 const AddNewEventPage = lazy(() => import("@/pages/admin/AddNewEventPage"));
+const EditEventPage = lazy(() => import("@/pages/admin/EditEventPage"));
 const HackathonAdminPage = lazy(() => import("@/pages/admin/HackathonAdminPage"));
 const SuperAdminPage = lazy(() => import("@/pages/superadmin/SuperAdminPage"));
 const HackathonRegisterPage = lazy(() => import("@/pages/hackathon/HackathonRegisterPage"));
@@ -40,6 +41,7 @@ export const AppRouter = () => (
           <Route path="/admin" element={<AdminMainPage />} />
           <Route path="/admin/events" element={<AdminEventsPage />} />
           <Route path="/admin/events/addNewEvent" element={<AddNewEventPage />} />
+          <Route path="/admin/events/:id/edit" element={<EditEventPage />} />
           <Route path="/admin/hackathon" element={<HackathonAdminPage />} />
         </Route>
 

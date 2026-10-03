@@ -9,11 +9,12 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 export interface PendingPhoto {
   id: string;
   file: File;
+  name: string;
   preview: string;
   altText: string;
 }
 
-export function usePhotoUploads() {
+export function usePhotoUploads(existingPhotoCount = 0) {
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -27,7 +28,10 @@ export function usePhotoUploads() {
     });
 
     setPhotos((current) => {
-      const availableSlots = Math.max(0, MAX_PHOTOS - current.length);
+      const availableSlots = Math.max(
+        0,
+        MAX_PHOTOS - existingPhotoCount - current.length
+      );
       if (valid.length > availableSlots) {
         toast.error(
           `Maximum ${MAX_PHOTOS} photos allowed. Only adding the first ${availableSlots}.`
@@ -36,12 +40,13 @@ export function usePhotoUploads() {
       const accepted = valid.slice(0, availableSlots).map((file) => ({
         id: crypto.randomUUID(),
         file,
+        name: file.name,
         preview: URL.createObjectURL(file),
         altText: "",
       }));
       return [...current, ...accepted];
     });
-  }, []);
+  }, [existingPhotoCount]);
 
   const removePhoto = useCallback((id: string) => {
     setPhotos((current) => {

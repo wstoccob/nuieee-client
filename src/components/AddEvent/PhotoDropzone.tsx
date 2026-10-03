@@ -1,9 +1,14 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { PendingPhoto } from "@/hooks/usePhotoUploads";
+export interface PhotoPreview {
+  id: string;
+  preview: string;
+  altText: string;
+  name?: string;
+}
 
 interface Props {
-  photos: PendingPhoto[];
+  photos: PhotoPreview[];
   maxPhotos: number;
   disabled?: boolean;
   onAdd: (files: FileList | null) => void;
@@ -32,7 +37,7 @@ export const PhotoDropzone = ({
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    onAdd(e.dataTransfer.files);
+    if (!disabled) onAdd(e.dataTransfer.files);
   };
 
   return (
@@ -42,12 +47,26 @@ export const PhotoDropzone = ({
       </label>
 
       <div
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled}
+        aria-label="Add event photos"
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
-        className={`border-2 border-dashed rounded-lg p-8 mb-6 text-center transition-all cursor-pointer ${
+        onClick={() => {
+          if (!disabled) inputRef.current?.click();
+        }}
+        onKeyDown={(event) => {
+          if (!disabled && (event.key === "Enter" || event.key === " ")) {
+            event.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
+        className={`border-2 border-dashed rounded-lg p-8 mb-6 text-center transition-all ${
+          disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+        } ${
           dragActive
             ? "border-ieee-blue bg-ieee-blue/10"
             : "border-[#555] bg-black/30 hover:border-ieee-blue"
@@ -59,6 +78,7 @@ export const PhotoDropzone = ({
           multiple
           accept="image/*"
           className="hidden"
+          disabled={disabled}
           onChange={(e) => {
             onAdd(e.target.files);
             e.target.value = "";
@@ -81,13 +101,14 @@ export const PhotoDropzone = ({
             >
               <img
                 src={photo.preview}
-                alt={photo.altText || photo.file.name}
+                alt={photo.altText || photo.name || "Event photo"}
                 className="w-full h-48 object-cover"
               />
               <div className="p-4 space-y-3">
                 <input
                   type="text"
                   value={photo.altText}
+                  aria-label={`Alt text for ${photo.name || "event photo"}`}
                   onChange={(e) => onAltTextChange(photo.id, e.target.value)}
                   placeholder="Alt text (for accessibility)"
                   className="w-full rounded-md border border-[#555] hover:border-ieee-blue bg-black text-white px-3 py-2 text-sm placeholder-white/40 transition-colors"
