@@ -1,10 +1,13 @@
 import { useCallback, useState } from "react";
+import imageCompression from "browser-image-compression";
 import { toast } from "sonner";
 import { storageApi } from "@/api/storage";
 import type { EventPhotoInput } from "@/dtos/event";
-
-const MAX_PHOTOS = Number(import.meta.env.VITE_MAX_EVENT_PHOTOS ?? 20);
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+import {
+  COMPRESSION_OPTIONS,
+  ALLOWED_PHOTO_TYPES,
+  MAX_EVENT_PHOTOS,
+} from "@/config/constants";
 
 export interface PendingPhoto {
   id: string;
@@ -12,39 +15,95 @@ export interface PendingPhoto {
   name: string;
   preview: string;
   altText: string;
+  status: "compressing" | "ready";
+  originalSize: number;
+  compressedSize?: number;
 }
 
 export function usePhotoUploads(existingPhotoCount = 0) {
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
   const [uploading, setUploading] = useState(false);
 
+  const compressSingleFile = async (id: string, file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setPhotos((current) =>
+        current.map((p) =>
+          p.id === id ? { ...p, status: "ready", compressedSize: file.size } : p
+        )
+      );
+      return;
+    }
+
+    try {
+      const compressedBlob = await imageCompression(file, COMPRESSION_OPTIONS);
+      const compressedFile = new File([compressedBlob], file.name, {
+        type: compressedBlob.type || file.type,
+        lastModified: Date.now(),
+      });
+
+      const finalFile = compressedFile.size < file.size ? compressedFile : file;
+
+      setPhotos((current) =>
+        current.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                file: finalFile,
+                status: "ready",
+                compressedSize: finalFile.size,
+              }
+            : p
+        )
+      );
+    } catch (error) {
+      console.error("Compression failed, using original:", error);
+      setPhotos((current) =>
+        current.map((p) =>
+          p.id === id ? { ...p, status: "ready", compressedSize: file.size } : p
+        )
+      );
+    }
+  };
+
   const addFiles = useCallback((files: FileList | null) => {
     if (!files) return;
 
     const valid = Array.from(files).filter((file) => {
-      if (ALLOWED_TYPES.includes(file.type)) return true;
+      if ((ALLOWED_PHOTO_TYPES as readonly string[]).includes(file.type)) return true;
       toast.error(`Invalid file type: ${file.name}. Only images allowed.`);
       return false;
     });
 
+    if (valid.length === 0) return;
+
     setPhotos((current) => {
       const availableSlots = Math.max(
         0,
-        MAX_PHOTOS - existingPhotoCount - current.length
+        MAX_EVENT_PHOTOS - existingPhotoCount - current.length
       );
       if (valid.length > availableSlots) {
         toast.error(
-          `Maximum ${MAX_PHOTOS} photos allowed. Only adding the first ${availableSlots}.`
+          `Maximum ${MAX_EVENT_PHOTOS} photos allowed. Only adding the first ${availableSlots}.`
         );
       }
-      const accepted = valid.slice(0, availableSlots).map((file) => ({
-        id: crypto.randomUUID(),
-        file,
-        name: file.name,
-        preview: URL.createObjectURL(file),
-        altText: "",
-      }));
-      return [...current, ...accepted];
+      const accepted = valid.slice(0, availableSlots);
+
+      const newItems: PendingPhoto[] = accepted.map((file) => {
+        const id = crypto.randomUUID();
+        compressSingleFile(id, file);
+
+        return {
+          id,
+          file,
+          name: file.name,
+          preview: URL.createObjectURL(file),
+          altText: "",
+          status: "compressing",
+          originalSize: file.size,
+        };
+      });
+
+      return [...current, ...newItems];
     });
   }, [existingPhotoCount]);
 
@@ -62,12 +121,6 @@ export function usePhotoUploads(existingPhotoCount = 0) {
     );
   }, []);
 
-  /**
-   * Upload every pending photo and return them as event payload entries.
-   *
-   * Each result keeps its own altText rather than being re-indexed against a
-   * filtered array, which previously misaligned captions when an upload failed.
-   */
   const uploadAll = useCallback(async (): Promise<EventPhotoInput[]> => {
     if (photos.length === 0) return [];
 
@@ -85,5 +138,13 @@ export function usePhotoUploads(existingPhotoCount = 0) {
     }
   }, [photos]);
 
-  return { photos, uploading, addFiles, removePhoto, setAltText, uploadAll, MAX_PHOTOS };
+  return {
+    photos,
+    uploading,
+    addFiles,
+    removePhoto,
+    setAltText,
+    uploadAll,
+    MAX_PHOTOS: MAX_EVENT_PHOTOS,
+  };
 }
