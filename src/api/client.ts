@@ -58,4 +58,8 @@ export function errorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
+export function errorStatus(error: unknown): number | undefined {
+  return axios.isAxiosError(error) ? error.response?.status : undefined;
+}
+
 export default client;
