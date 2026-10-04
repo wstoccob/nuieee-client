@@ -1,18 +1,21 @@
 import { useEffect } from "react";
+import { ORGANISER_EMAIL } from "@/config/hackathon";
 import { Alert } from "../ui/Alert";
 import { ButtonLink } from "../ui/Button";
 import { Card } from "../ui/Card";
-import { ArrowRightIcon, CheckIcon } from "../ui/icons";
-import { TeamLinkPanel } from "../TeamLinkPanel";
+import { ArrowLeftIcon, CheckIcon } from "../ui/icons";
+import { MemberRow } from "../MemberRow";
 import type { Registered } from "./RegistrationForm";
 
 interface RegistrationSuccessProps {
   eventTitle: string;
+  eventSlug: string;
   registered: Registered;
 }
 
-export function RegistrationSuccess({ eventTitle, registered }: RegistrationSuccessProps) {
-  const { token, teamName, memberEmails, linkEmailed } = registered;
+export function RegistrationSuccess({ eventTitle, eventSlug, registered }: RegistrationSuccessProps) {
+  const { teamName, members } = registered;
+  const captain = members.find((member) => member.isCaptain);
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
@@ -32,30 +35,30 @@ export function RegistrationSuccess({ eventTitle, registered }: RegistrationSucc
         </div>
       </div>
 
-      {linkEmailed && (
-        <Alert tone="success" title="We emailed this link to your team">
-          Every member ({memberEmails.length}) should get it within a few minutes. If it isn't there, check
-          the spam folder, and save the link below anyway.
-        </Alert>
-      )}
-
-      <Card className="border-hk-accent-fg/30 bg-hk-accent/[0.07]">
-        <h2 className="text-lg font-semibold text-white">Your team link</h2>
-        <p className="mt-1 mb-5 text-sm leading-relaxed text-zinc-300">
-          This is how your team chooses a case and uploads its solution. Save it somewhere safe right now.
-        </p>
-        <TeamLinkPanel token={token} eventTitle={eventTitle} memberEmails={memberEmails} showQrByDefault />
-      </Card>
-
-      <Alert tone="warning" title="This link is the only way back in">
-        We can't show it again, and there are no passwords. Share it only with your teammates: anyone who
-        has it can change your case and your submission. It is also saved in this browser, so this device
-        can reopen the team page from the hackathon page.
+      <Alert tone="success" title="What happens next">
+        The organisers will contact your captain
+        {captain && (
+          <>
+            {" "}at <span className="font-medium break-all text-white">{captain.email}</span>
+          </>
+        )}{" "}
+        from <span className="font-medium text-white">{ORGANISER_EMAIL}</span>. Keep an eye on that inbox,
+        including the spam folder.
       </Alert>
 
-      <ButtonLink to={{ pathname: "/hackathon/team", hash: token }} size="lg" className="w-full sm:w-auto">
-        Open team page
-        <ArrowRightIcon />
+      <Card>
+        <h2 className="text-lg font-semibold text-white">{teamName}</h2>
+        <p className="mt-1 text-sm text-zinc-400">{members.length} members</p>
+        <ul className="mt-5 divide-y divide-white/10 border-t border-white/10 pt-4">
+          {members.map((member) => (
+            <MemberRow key={member.email} member={member} />
+          ))}
+        </ul>
+      </Card>
+
+      <ButtonLink to={`/hackathon/${eventSlug}`} variant="secondary" className="w-full sm:w-auto">
+        <ArrowLeftIcon />
+        Back to the event
       </ButtonLink>
     </div>
   );

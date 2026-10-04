@@ -1,16 +1,5 @@
 import client from "./client";
-import type {
-  AdminTeam,
-  BigEventAdmin,
-  BigEventWrite,
-  Case,
-  CaseWrite,
-  DownloadLink,
-  PostUploadTarget,
-  UploadConfirm,
-  UploadRequest,
-  AccessTokenIssued,
-} from "@/dtos/hackathon";
+import type { AdminTeam, BigEventAdmin, BigEventWrite } from "@/dtos/hackathon";
 
 export const hackathonAdminApi = {
   async listEvents(): Promise<BigEventAdmin[]> {
@@ -37,48 +26,6 @@ export const hackathonAdminApi = {
     await client.delete(`/admin/big-events/${id}`);
   },
 
-  async listCases(eventId: string): Promise<Case[]> {
-    const { data } = await client.get<Case[]>(`/admin/big-events/${eventId}/cases`);
-    return data;
-  },
-
-  async createCase(eventId: string, payload: CaseWrite): Promise<Case> {
-    const { data } = await client.post<Case>(`/admin/big-events/${eventId}/cases`, payload);
-    return data;
-  },
-
-  async updateCase(caseId: string, payload: CaseWrite): Promise<Case> {
-    const { data } = await client.put<Case>(`/admin/cases/${caseId}`, payload);
-    return data;
-  },
-
-  async deleteCase(caseId: string): Promise<void> {
-    await client.delete(`/admin/cases/${caseId}`);
-  },
-
-  async attachmentTarget(caseId: string, payload: UploadRequest): Promise<PostUploadTarget> {
-    const { data } = await client.post<PostUploadTarget>(
-      `/admin/cases/${caseId}/attachment/upload-target`,
-      payload
-    );
-    return data;
-  },
-
-  async confirmAttachment(caseId: string, payload: UploadConfirm): Promise<Case> {
-    const { data } = await client.put<Case>(`/admin/cases/${caseId}/attachment`, payload);
-    return data;
-  },
-
-  async removeAttachment(caseId: string): Promise<Case> {
-    const { data } = await client.delete<Case>(`/admin/cases/${caseId}/attachment`);
-    return data;
-  },
-
-  async attachmentUrl(caseId: string): Promise<string> {
-    const { data } = await client.get<DownloadLink>(`/admin/cases/${caseId}/attachment`);
-    return data.url;
-  },
-
   async listTeams(eventId: string): Promise<AdminTeam[]> {
     const { data } = await client.get<AdminTeam[]>(`/admin/big-events/${eventId}/teams`);
     return data;
@@ -91,19 +38,7 @@ export const hackathonAdminApi = {
     return data;
   },
 
-  async rotateTeamToken(teamId: string): Promise<AccessTokenIssued> {
-    const { data } = await client.post<AccessTokenIssued>(
-      `/admin/teams/${teamId}/access-token`
-    );
-    return data;
-  },
-
   async deleteTeam(teamId: string): Promise<void> {
     await client.delete(`/admin/teams/${teamId}`);
-  },
-
-  async submissionUrl(teamId: string): Promise<string> {
-    const { data } = await client.get<DownloadLink>(`/admin/teams/${teamId}/submission`);
-    return data.url;
   },
 };

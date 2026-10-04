@@ -1,23 +1,23 @@
 import type { BigEvent } from "@/dtos/hackathon";
-import { formatDateTime, formatDateTimeRange, formatRelative, isFuture } from "./datetime";
+import { formatDateTimeRange, formatRelative, isFuture } from "./datetime";
 
-export type PhaseState = "open" | "upcoming" | "closed" | "unscheduled";
+export type PhaseState = "open" | "upcoming" | "closed";
 
 export interface Phase {
-  key: "registration" | "cases" | "submissions";
+  key: "registration" | "event";
   label: string;
   description: string;
-  start: string | null;
-  end: string | null;
+  start: string;
+  end: string;
   state: PhaseState;
+  openLabel: string;
+  startVerb: string;
+  endVerb: string;
 }
 
-// The open flags come from the server and are the source of truth; the browser clock is
-// only used to tell "not yet" apart from "already over" for display.
-function phaseState(open: boolean, start: string | null): PhaseState {
-  if (open) return "open";
-  if (start === null) return "unscheduled";
-  return isFuture(start) ? "upcoming" : "closed";
+function stateFromClock(start: string, end: string): PhaseState {
+  if (isFuture(start)) return "upcoming";
+  return isFuture(end) ? "open" : "closed";
 }
 
 export function eventPhases(event: BigEvent): Phase[] {
@@ -25,39 +25,37 @@ export function eventPhases(event: BigEvent): Phase[] {
     {
       key: "registration",
       label: "Registration",
-      description: "Sign up your team",
+      description: "Sign up your team on this page",
       start: event.registrationOpensAt,
       end: event.registrationClosesAt,
-      state: phaseState(event.registrationOpen, event.registrationOpensAt),
+      // The server's flag is the source of truth for registration; the browser clock only
+      // tells "not yet" apart from "already over".
+      state: event.registrationOpen ? "open" : isFuture(event.registrationOpensAt) ? "upcoming" : "closed",
+      openLabel: "Open now",
+      startVerb: "Opens",
+      endVerb: "Closes",
     },
     {
-      key: "cases",
-      label: "Case selection",
-      description: "Pick the case your team will solve",
-      start: event.caseSelectionOpensAt,
-      end: event.submissionsCloseAt,
-      state: phaseState(event.caseSelectionOpen, event.caseSelectionOpensAt),
-    },
-    {
-      key: "submissions",
-      label: "Submissions",
-      description: "Upload your final solution",
-      start: event.submissionsOpenAt,
-      end: event.submissionsCloseAt,
-      state: phaseState(event.submissionsOpen, event.submissionsOpenAt),
+      key: "event",
+      label: event.kind === "hackathon" ? "Hackathon" : "Conference",
+      description: "Cases and submission details come from the organisers by email",
+      start: event.startsAt,
+      end: event.endsAt,
+      state: stateFromClock(event.startsAt, event.endsAt),
+      openLabel: "Happening now",
+      startVerb: "Starts",
+      endVerb: "Ends",
     },
   ];
 }
 
 export function phaseWindow({ start, end }: Pick<Phase, "start" | "end">): string {
-  if (start && end) return formatDateTimeRange(start, end);
-  if (start) return `From ${formatDateTime(start)}`;
-  return "Dates to be announced";
+  return formatDateTimeRange(start, end);
 }
 
-export function phaseCountdown({ state, start, end }: Phase): string | null {
-  if (state === "open" && end) return `Closes ${formatRelative(end)}`;
-  if (state === "upcoming" && start) return `Opens ${formatRelative(start)}`;
+export function phaseCountdown({ state, start, end, startVerb, endVerb }: Phase): string | null {
+  if (state === "open") return `${endVerb} ${formatRelative(end)}`;
+  if (state === "upcoming") return `${startVerb} ${formatRelative(start)}`;
   return null;
 }
 

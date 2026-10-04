@@ -1,8 +1,7 @@
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useHackathon } from "@/hooks/useHackathons";
 import { formatDateRange, formatDateTime, formatRelative, isFuture } from "@/lib/datetime";
 import { teamSizeLabel } from "@/lib/hackathonPhases";
-import { savedTeamToken } from "@/lib/teamToken";
 import type { BigEvent } from "@/dtos/hackathon";
 import { PublicShell } from "@/components/hackathon/Shells";
 import { EventGate } from "@/components/hackathon/EventStates";
@@ -11,7 +10,6 @@ import { Badge } from "@/components/hackathon/ui/Badge";
 import { ButtonLink } from "@/components/hackathon/ui/Button";
 import { Card, CardHeader } from "@/components/hackathon/ui/Card";
 import { ArrowRightIcon, CalendarIcon, ClockIcon, LockIcon, UsersIcon } from "@/components/hackathon/ui/icons";
-import { focusRing } from "@/components/hackathon/ui/styles";
 
 function RegistrationStatus({ event }: { event: BigEvent }) {
   if (event.registrationOpen) {
@@ -48,35 +46,19 @@ function RegistrationStatus({ event }: { event: BigEvent }) {
 }
 
 function RegistrationCard({ event }: { event: BigEvent }) {
-  const hasSavedTeam = Boolean(savedTeamToken(event.slug));
   return (
     <Card className={event.registrationOpen ? "border-hk-accent-fg/30 bg-hk-accent/[0.07]" : undefined}>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <RegistrationStatus event={event} />
         </div>
-        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-          {event.registrationOpen && (
-            <ButtonLink to={`/hackathon/${event.slug}/register`} size="lg" className="w-full sm:w-auto">
-              Register your team
-              <ArrowRightIcon />
-            </ButtonLink>
-          )}
-          {hasSavedTeam && (
-            <ButtonLink to="/hackathon/team" variant="secondary" className="w-full sm:w-auto">
-              Open your team page
-            </ButtonLink>
-          )}
-        </div>
+        {event.registrationOpen && (
+          <ButtonLink to={`/hackathon/${event.slug}/register`} size="lg" className="w-full shrink-0 sm:w-auto">
+            Register your team
+            <ArrowRightIcon />
+          </ButtonLink>
+        )}
       </div>
-      {!hasSavedTeam && (
-        <p className="mt-5 border-t border-white/10 pt-4 text-sm text-zinc-400">
-          Already registered? Open the team link you got after registering.{" "}
-          <Link to="/hackathon/team" className={`rounded font-medium text-hk-accent-fg hover:underline ${focusRing}`}>
-            Open your team page
-          </Link>
-        </p>
-      )}
     </Card>
   );
 }
@@ -111,7 +93,7 @@ function EventDetails({ event }: { event: BigEvent }) {
       <RegistrationCard event={event} />
 
       <Card>
-        <CardHeader title="Schedule" description="What happens when. Each step opens on this site." />
+        <CardHeader title="Schedule" description="Key dates for your team." />
         <EventTimeline event={event} />
       </Card>
 

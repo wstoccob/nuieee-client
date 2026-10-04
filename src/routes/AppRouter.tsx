@@ -19,7 +19,6 @@ const SuperAdminPage = lazy(() => import("@/pages/superadmin/SuperAdminPage"));
 const HackathonIndexPage = lazy(() => import("@/pages/hackathon/HackathonIndexPage"));
 const HackathonEventPage = lazy(() => import("@/pages/hackathon/HackathonEventPage"));
 const TeamRegistrationPage = lazy(() => import("@/pages/hackathon/TeamRegistrationPage"));
-const TeamDashboardPage = lazy(() => import("@/pages/hackathon/TeamDashboardPage"));
 const Hackathon2Page = lazy(() => import("@/pages/hackathon/Hackathon2Page"));
 const PodcastsPage = lazy(() => import("@/pages/PodcastsPage"));
 
@@ -40,7 +39,6 @@ export const AppRouter = () => (
         <Route path="/podcasts" element={<PodcastsPage />} />
         <Route path="/hackathon" element={<HackathonIndexPage />} />
         <Route path="/hackathon/register" element={<Navigate to="/hackathon" replace />} />
-        <Route path="/hackathon/team" element={<TeamDashboardPage />} />
         <Route path="/hackathon/:slug" element={<HackathonEventPage />} />
         <Route path="/hackathon/:slug/register" element={<TeamRegistrationPage />} />
         <Route path="/hackathon2" element={<Hackathon2Page />} />

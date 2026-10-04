@@ -23,8 +23,7 @@ export const KIND_OPTIONS: { value: BigEventKind; label: string }[] = [
   { value: "conference", label: "Conference" },
 ];
 
-export const SUBMISSION_EXTENSIONS = [".pdf", ".pptx"];
-export const CASE_ATTACHMENT_EXTENSIONS = [".pdf", ".pptx", ".docx", ".xlsx", ".zip"];
+export const ORGANISER_EMAIL = "ieee@nu.edu.kz";
 
 export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 

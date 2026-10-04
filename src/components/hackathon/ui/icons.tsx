@@ -27,13 +27,6 @@ export const CheckIcon = (p: IconProps) => (
   </Icon>
 );
 
-export const CopyIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <rect x="9" y="9" width="12" height="12" rx="2" />
-    <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
-  </Icon>
-);
-
 export const CalendarIcon = (p: IconProps) => (
   <Icon {...p}>
     <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -46,12 +39,6 @@ export const UsersIcon = (p: IconProps) => (
     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
     <circle cx="9" cy="7" r="4" />
     <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-  </Icon>
-);
-
-export const UploadIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
   </Icon>
 );
 
@@ -108,18 +95,6 @@ export const TrashIcon = (p: IconProps) => (
   </Icon>
 );
 
-export const PencilIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z" />
-  </Icon>
-);
-
-export const RefreshIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M3 21v-5h5" />
-  </Icon>
-);
-
 export const SearchIcon = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="11" cy="11" r="7" />
@@ -154,34 +129,5 @@ export const ExternalIcon = (p: IconProps) => (
 export const StarIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z" />
-  </Icon>
-);
-
-export const XIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M18 6 6 18M6 6l12 12" />
-  </Icon>
-);
-
-export const LinkIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" />
-    <path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" />
-  </Icon>
-);
-
-export const MailIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <rect x="3" y="5" width="18" height="14" rx="2" />
-    <path d="m3 7 9 6 9-6" />
-  </Icon>
-);
-
-export const QrIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <rect x="3" y="3" width="7" height="7" rx="1" />
-    <rect x="14" y="3" width="7" height="7" rx="1" />
-    <rect x="3" y="14" width="7" height="7" rx="1" />
-    <path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3" />
   </Icon>
 );

@@ -2,26 +2,21 @@ import { Fragment, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { errorMessage } from "@/api/client";
 import { hackathonAdminApi } from "@/api/hackathonAdmin";
-import { useAdminTeams, useDeleteTeam, useRotateTeamToken } from "@/hooks/useHackathonAdmin";
+import { useAdminTeams, useDeleteTeam } from "@/hooks/useHackathonAdmin";
 import { formatDateTime } from "@/lib/datetime";
-import { openFetchedLink, saveBlob } from "@/lib/download";
-import { formatBytes } from "@/lib/files";
+import { saveBlob } from "@/lib/download";
 import { cn } from "@/lib/utils";
 import type { AdminTeam, BigEventAdmin } from "@/dtos/hackathon";
-import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
-import { ConfirmDialog, Dialog } from "../ui/Dialog";
+import { ConfirmDialog } from "../ui/Dialog";
 import { Input } from "../ui/form";
 import { EmptyState, ErrorState, PageLoader } from "../ui/states";
-import { ChevronDownIcon, DownloadIcon, RefreshIcon, SearchIcon, TrashIcon, UsersIcon } from "../ui/icons";
-import { MemberRow } from "../team/TeamOverview";
-import { TeamLinkPanel } from "../TeamLinkPanel";
+import { ChevronDownIcon, DownloadIcon, SearchIcon, TrashIcon, UsersIcon } from "../ui/icons";
+import { MemberRow } from "../MemberRow";
 
 function matches(team: AdminTeam, query: string): boolean {
   const haystack = [
     team.name,
-    team.case?.title ?? "",
-    team.case?.company ?? "",
     ...team.members.flatMap((m) => [m.fullName, m.email, m.nuId ?? ""]),
   ]
     .join(" ")
@@ -42,25 +37,12 @@ interface TeamRowProps {
   team: AdminTeam;
   expanded: boolean;
   onToggle: () => void;
-  onRotate: () => void;
   onDelete: () => void;
 }
 
-function TeamRow({ team, expanded, onToggle, onRotate, onDelete }: TeamRowProps) {
-  const [opening, setOpening] = useState(false);
+function TeamRow({ team, expanded, onToggle, onDelete }: TeamRowProps) {
   const captain = team.members.find((m) => m.isCaptain);
   const detailsId = `team-${team.id}-members`;
-
-  const downloadSubmission = async () => {
-    setOpening(true);
-    try {
-      await openFetchedLink(() => hackathonAdminApi.submissionUrl(team.id));
-    } catch (error) {
-      toast.error(errorMessage(error, "Couldn't open the submission."));
-    } finally {
-      setOpening(false);
-    }
-  };
 
   return (
     <Fragment>
@@ -91,32 +73,8 @@ function TeamRow({ team, expanded, onToggle, onRotate, onDelete }: TeamRowProps)
             <span className="text-zinc-500">—</span>
           )}
         </td>
-        <td className="px-3 py-3">
-          {team.case ? <span className="text-zinc-200">{team.case.title}</span> : <span className="text-zinc-500">Not chosen</span>}
-        </td>
-        <td className="px-3 py-3">
-          {team.submission ? (
-            <div className="flex items-start gap-2">
-              <div className="min-w-0">
-                <Badge tone="green">Submitted</Badge>
-                <span className="mt-1 block max-w-44 truncate text-xs text-zinc-500" title={team.submission.originalFilename}>
-                  {team.submission.originalFilename} · {formatBytes(team.submission.sizeBytes)}
-                </span>
-              </div>
-              <Button variant="ghost" size="icon" onClick={downloadSubmission} loading={opening} aria-label={`Download submission of ${team.name}`}>
-                {!opening && <DownloadIcon />}
-              </Button>
-            </div>
-          ) : (
-            <Badge>None</Badge>
-          )}
-        </td>
         <td className="py-3 pr-4 pl-3">
           <div className="flex justify-end gap-1">
-            <Button variant="ghost" size="sm" onClick={onRotate}>
-              <RefreshIcon />
-              New link
-            </Button>
             <Button variant="dangerGhost" size="icon" onClick={onDelete} aria-label={`Delete ${team.name}`}>
               <TrashIcon />
             </Button>
@@ -125,15 +83,12 @@ function TeamRow({ team, expanded, onToggle, onRotate, onDelete }: TeamRowProps)
       </tr>
       {expanded && (
         <tr id={detailsId} className="bg-white/[0.02]">
-          <td colSpan={6} className="px-4 pt-1 pb-5">
+          <td colSpan={4} className="px-4 pt-1 pb-5">
             <ul className="grid gap-x-6 gap-y-1 rounded-xl border border-white/10 bg-black/30 p-4 sm:grid-cols-2 [&>li]:py-2">
               {team.members.map((member) => (
                 <MemberRow key={member.email} member={member} />
               ))}
             </ul>
-            {team.submission && (
-              <p className="mt-3 text-xs text-zinc-500">Submitted {formatDateTime(team.submission.submittedAt)}</p>
-            )}
           </td>
         </tr>
       )}
@@ -143,13 +98,10 @@ function TeamRow({ team, expanded, onToggle, onRotate, onDelete }: TeamRowProps)
 
 export function TeamsTab({ event }: { event: BigEventAdmin }) {
   const { data: teams, isPending, error, refetch, isFetching } = useAdminTeams(event.id);
-  const rotate = useRotateTeamToken();
   const deleteTeam = useDeleteTeam(event.id);
   const [query, setQuery] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [toRotate, setToRotate] = useState<AdminTeam | null>(null);
   const [toDelete, setToDelete] = useState<AdminTeam | null>(null);
-  const [newLink, setNewLink] = useState<{ team: AdminTeam; token: string; emailed: boolean } | null>(null);
   const [exporting, setExporting] = useState(false);
 
   const filtered = useMemo(() => {
@@ -174,17 +126,6 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
     }
   };
 
-  const confirmRotate = async () => {
-    if (!toRotate) return;
-    try {
-      const issued = await rotate.mutateAsync(toRotate.id);
-      setNewLink({ team: toRotate, token: issued.accessToken, emailed: issued.linkEmailed });
-      setToRotate(null);
-    } catch (err) {
-      toast.error(errorMessage(err, "Couldn't create a new link."));
-    }
-  };
-
   const confirmDelete = async () => {
     if (!toDelete) return;
     try {
@@ -198,10 +139,9 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Stat label="Teams" value={teams.length} />
-        <Stat label="Chose a case" value={teams.filter((t) => t.case).length} />
-        <Stat label="Submitted" value={teams.filter((t) => t.submission).length} />
+        <Stat label="Participants" value={teams.reduce((sum, t) => sum + t.members.length, 0)} />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -210,7 +150,7 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
           <Input
             type="search"
             aria-label="Search teams"
-            placeholder="Search by team, member, email, NU ID or case"
+            placeholder="Search by team, member, email or NU ID"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-10"
@@ -228,15 +168,13 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
         <EmptyState icon={<SearchIcon />} title="No matches" description={`Nothing matches “${query}”.`} />
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-white/10">
-          <table className="w-full min-w-[820px] text-left text-sm">
+          <table className="w-full min-w-[560px] text-left text-sm">
             <caption className="sr-only">Registered teams</caption>
             <thead className="bg-white/[0.03] text-xs font-medium text-zinc-500">
               <tr>
                 <th scope="col" className="py-3 pr-3 pl-4 font-medium">Team</th>
                 <th scope="col" className="px-3 py-3 font-medium">Members</th>
                 <th scope="col" className="px-3 py-3 font-medium">Captain</th>
-                <th scope="col" className="px-3 py-3 font-medium">Case</th>
-                <th scope="col" className="px-3 py-3 font-medium">Submission</th>
                 <th scope="col" className="py-3 pr-4 pl-3 text-right font-medium">Actions</th>
               </tr>
             </thead>
@@ -247,7 +185,6 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
                   team={team}
                   expanded={expandedId === team.id}
                   onToggle={() => setExpandedId((id) => (id === team.id ? null : team.id))}
-                  onRotate={() => setToRotate(team)}
                   onDelete={() => setToDelete(team)}
                 />
               ))}
@@ -262,42 +199,14 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
       )}
 
       <ConfirmDialog
-        open={toRotate !== null}
-        title="Replace this team's link?"
-        description={`The current link for ${toRotate?.name ?? "this team"} stops working immediately, on every device. You'll have to send the new link to the team.`}
-        confirmLabel="Create new link"
-        busy={rotate.isPending}
-        onConfirm={confirmRotate}
-        onClose={() => setToRotate(null)}
-      />
-      <ConfirmDialog
         open={toDelete !== null}
         title="Delete this team?"
-        description={`${toDelete?.name ?? "The team"}, its members and its submission will be deleted. This can't be undone.`}
+        description={`${toDelete?.name ?? "The team"}, and its members will be deleted. This can't be undone.`}
         confirmLabel="Delete team"
         busy={deleteTeam.isPending}
         onConfirm={confirmDelete}
         onClose={() => setToDelete(null)}
       />
-      <Dialog
-        open={newLink !== null}
-        title={`New link for ${newLink?.team.name ?? ""}`}
-        description={
-          newLink?.emailed
-            ? "We emailed it to every member. The old link no longer works, and this is the only time it's shown here."
-            : "This is the only time it's shown. Send it to the team now. The old link no longer works."
-        }
-        onClose={() => setNewLink(null)}
-        footer={<Button onClick={() => setNewLink(null)}>Done</Button>}
-      >
-        {newLink && (
-          <TeamLinkPanel
-            token={newLink.token}
-            eventTitle={event.title}
-            memberEmails={newLink.team.members.map((m) => m.email)}
-          />
-        )}
-      </Dialog>
     </div>
   );
 }

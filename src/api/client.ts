@@ -24,10 +24,8 @@ export function clearStoredToken(): void {
   sessionStorage.removeItem(TOKEN_KEY);
 }
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.ieee.nu/api";
-
 const client = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://api.ieee.nu/api",
   headers: { "Content-Type": "application/json" },
 });
 

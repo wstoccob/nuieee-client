@@ -31,9 +31,6 @@ export const settingsSchema = z
     endsAt: required,
     registrationOpensAt: required,
     registrationClosesAt: required,
-    caseSelectionOpensAt: z.string(),
-    submissionsOpenAt: z.string(),
-    submissionsCloseAt: z.string(),
     minTeamSize: wholeNumber(1, 20),
     maxTeamSize: wholeNumber(1, 20),
     capacity: z
@@ -52,11 +49,6 @@ export const settingsSchema = z
     if (Number(v.minTeamSize) > Number(v.maxTeamSize)) {
       issue("maxTeamSize", "Can't be smaller than the minimum");
     }
-    if (Boolean(v.submissionsOpenAt) !== Boolean(v.submissionsCloseAt)) {
-      issue(v.submissionsOpenAt ? "submissionsCloseAt" : "submissionsOpenAt", "Set both submission dates, or neither");
-    } else if (v.submissionsOpenAt && time(v.submissionsCloseAt)! <= time(v.submissionsOpenAt)!) {
-      issue("submissionsCloseAt", "Submissions must close after they open");
-    }
   });
 
 export type SettingsValues = z.infer<typeof settingsSchema>;
@@ -73,9 +65,6 @@ export const DEFAULT_SETTINGS: SettingsValues = {
   endsAt: "",
   registrationOpensAt: "",
   registrationClosesAt: "",
-  caseSelectionOpensAt: "",
-  submissionsOpenAt: "",
-  submissionsCloseAt: "",
   minTeamSize: "4",
   maxTeamSize: "5",
   capacity: "",
@@ -94,9 +83,6 @@ export function settingsFromEvent(event: BigEventAdmin): SettingsValues {
     endsAt: toDateTimeLocal(event.endsAt),
     registrationOpensAt: toDateTimeLocal(event.registrationOpensAt),
     registrationClosesAt: toDateTimeLocal(event.registrationClosesAt),
-    caseSelectionOpensAt: toDateTimeLocal(event.caseSelectionOpensAt),
-    submissionsOpenAt: toDateTimeLocal(event.submissionsOpenAt),
-    submissionsCloseAt: toDateTimeLocal(event.submissionsCloseAt),
     minTeamSize: String(event.minTeamSize),
     maxTeamSize: String(event.maxTeamSize),
     capacity: event.capacity === null ? "" : String(event.capacity),
@@ -116,9 +102,6 @@ export function settingsToWrite(v: SettingsValues): BigEventWrite {
     endsAt: fromDateTimeLocal(v.endsAt)!,
     registrationOpensAt: fromDateTimeLocal(v.registrationOpensAt)!,
     registrationClosesAt: fromDateTimeLocal(v.registrationClosesAt)!,
-    caseSelectionOpensAt: fromDateTimeLocal(v.caseSelectionOpensAt),
-    submissionsOpenAt: fromDateTimeLocal(v.submissionsOpenAt),
-    submissionsCloseAt: fromDateTimeLocal(v.submissionsCloseAt),
     minTeamSize: Number(v.minTeamSize),
     maxTeamSize: Number(v.maxTeamSize),
     capacity: v.capacity.trim() ? Number(v.capacity) : null,

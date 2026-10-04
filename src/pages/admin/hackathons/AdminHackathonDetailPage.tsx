@@ -6,7 +6,6 @@ import { useAdminHackathon, useDeleteHackathon, useUpdateHackathon } from "@/hoo
 import { formatDateRange } from "@/lib/datetime";
 import type { BigEventAdmin } from "@/dtos/hackathon";
 import { AdminShell, BackLink, PageHeader } from "@/components/hackathon/Shells";
-import { CasesTab } from "@/components/hackathon/admin/CasesTab";
 import { EventBadges } from "@/components/hackathon/admin/EventBadges";
 import { EventSettingsForm } from "@/components/hackathon/admin/EventSettingsForm";
 import { TeamsTab } from "@/components/hackathon/admin/TeamsTab";
@@ -17,8 +16,8 @@ import { EmptyState, ErrorState, PageLoader } from "@/components/hackathon/ui/st
 import { TabPanel, Tabs } from "@/components/hackathon/ui/Tabs";
 import { CalendarIcon, ExternalIcon, TrashIcon } from "@/components/hackathon/ui/icons";
 
-type TabId = "settings" | "cases" | "teams";
-const TAB_IDS: TabId[] = ["settings", "cases", "teams"];
+type TabId = "settings" | "teams";
+const TAB_IDS: TabId[] = ["settings", "teams"];
 
 function SettingsTab({ event }: { event: BigEventAdmin }) {
   const navigate = useNavigate();
@@ -43,7 +42,7 @@ function SettingsTab({ event }: { event: BigEventAdmin }) {
       <Card className="border-red-400/20 bg-red-500/[0.04]">
         <CardHeader
           title="Delete this hackathon"
-          description="Deletes every team, case and uploaded file for this event. This can't be undone."
+          description="Deletes the event and every team registered for it. This can't be undone."
           action={
             <Button variant="danger" onClick={() => setConfirming(true)}>
               <TrashIcon />
@@ -56,7 +55,7 @@ function SettingsTab({ event }: { event: BigEventAdmin }) {
       <ConfirmDialog
         open={confirming}
         title={`Delete ${event.title}?`}
-        description={`This permanently deletes ${event.teamCount} ${event.teamCount === 1 ? "team" : "teams"}, all cases and every uploaded file.`}
+        description={`This permanently deletes ${event.teamCount} ${event.teamCount === 1 ? "team" : "teams"} and their members.`}
         confirmText={event.title}
         confirmLabel="Delete hackathon"
         busy={remove.isPending}
@@ -100,13 +99,11 @@ function EventAdmin({ event }: { event: BigEventAdmin }) {
         onChange={selectTab}
         tabs={[
           { id: "settings", label: "Settings" },
-          { id: "cases", label: "Cases" },
           { id: "teams", label: `Teams (${event.teamCount})` },
         ]}
       />
       <TabPanel idPrefix="hackathon" id={tab}>
         {tab === "settings" && <SettingsTab event={event} />}
-        {tab === "cases" && <CasesTab eventId={event.id} />}
         {tab === "teams" && <TeamsTab event={event} />}
       </TabPanel>
     </>

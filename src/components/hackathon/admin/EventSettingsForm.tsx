@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import { useForm, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -29,8 +29,6 @@ interface EventSettingsFormProps {
 interface DateFieldProps {
   name: FieldPath<SettingsValues>;
   label: string;
-  hint?: ReactNode;
-  optional?: boolean;
 }
 
 export function EventSettingsForm({ initial, submitLabel, onSubmit }: EventSettingsFormProps) {
@@ -58,8 +56,8 @@ export function EventSettingsForm({ initial, submitLabel, onSubmit }: EventSetti
   };
 
   // Called as a function, not rendered as <DateField>, so inputs keep focus across re-renders.
-  const dateField = ({ name, label, hint, optional }: DateFieldProps) => (
-    <Field label={label} hint={hint} optional={optional} error={errors[name]?.message}>
+  const dateField = ({ name, label }: DateFieldProps) => (
+    <Field label={label} error={errors[name]?.message}>
       {(control) => <Input {...control} type="datetime-local" {...register(name)} />}
     </Field>
   );
@@ -150,10 +148,6 @@ export function EventSettingsForm({ initial, submitLabel, onSubmit }: EventSetti
           {dateField({ name: "endsAt", label: "Event ends" })}
           {dateField({ name: "registrationOpensAt", label: "Registration opens" })}
           {dateField({ name: "registrationClosesAt", label: "Registration closes" })}
-          {dateField({ name: "caseSelectionOpensAt", label: "Cases revealed and selection opens", optional: true, hint: "Selection stays open until submissions close." })}
-          <div className="hidden sm:block" />
-          {dateField({ name: "submissionsOpenAt", label: "Submissions open", optional: true })}
-          {dateField({ name: "submissionsCloseAt", label: "Submissions close", optional: true })}
         </div>
       </Card>
 

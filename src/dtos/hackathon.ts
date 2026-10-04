@@ -17,13 +17,7 @@ export interface BigEvent {
   status: BigEventStatus;
   minTeamSize: number;
   maxTeamSize: number;
-  caseSelectionOpensAt: string | null;
-  submissionsOpenAt: string | null;
-  submissionsCloseAt: string | null;
   registrationOpen: boolean;
-  casesVisible: boolean;
-  caseSelectionOpen: boolean;
-  submissionsOpen: boolean;
 }
 
 export interface BigEventAdmin extends BigEvent {
@@ -46,27 +40,6 @@ export interface BigEventWrite {
   isFeatured: boolean;
   minTeamSize: number;
   maxTeamSize: number;
-  caseSelectionOpensAt: string | null;
-  submissionsOpenAt: string | null;
-  submissionsCloseAt: string | null;
-}
-
-export interface Case {
-  id: string;
-  company: string;
-  title: string;
-  description: string;
-  sortOrder: number;
-  attachmentFilename: string | null;
-  attachmentSizeBytes: number | null;
-  hasAttachment: boolean;
-}
-
-export interface CaseWrite {
-  company: string;
-  title: string;
-  description: string;
-  sortOrder: number;
 }
 
 export interface Member {
@@ -78,32 +51,11 @@ export interface Member {
   isCaptain: boolean;
 }
 
-export interface Submission {
-  originalFilename: string;
-  contentType: string;
-  sizeBytes: number;
-  submittedAt: string;
-}
-
-export interface TeamDashboard {
-  id: string;
-  name: string;
-  createdAt: string;
-  members: Member[];
-  event: BigEvent;
-  case: Case | null;
-  cases: Case[];
-  submission: Submission | null;
-  submissionMaxBytes: number;
-}
-
 export interface AdminTeam {
   id: string;
   name: string;
   createdAt: string;
   members: Member[];
-  case: Case | null;
-  submission: (Submission & { id: string }) | null;
 }
 
 export interface TeamRegistration {
@@ -117,33 +69,4 @@ export interface TeamRegistration {
 
 export interface RegistrationResult {
   teamId: string;
-  accessToken: string;
-  /** True when the server queued an email with the link to every member. */
-  linkEmailed: boolean;
-}
-
-export interface AccessTokenIssued {
-  accessToken: string;
-  linkEmailed: boolean;
-}
-
-export interface PostUploadTarget {
-  url: string;
-  fields: Record<string, string>;
-  objectKey: string;
-  maxBytes: number;
-}
-
-export interface UploadRequest {
-  filename: string;
-  sizeBytes: number;
-}
-
-export interface UploadConfirm {
-  objectKey: string;
-  filename: string;
-}
-
-export interface DownloadLink {
-  url: string;
 }

@@ -5,11 +5,9 @@ import type { BigEvent } from "@/dtos/hackathon";
 import { Badge, type BadgeTone } from "./ui/Badge";
 import { CheckIcon } from "./ui/icons";
 
-const STATE_BADGE: Record<PhaseState, { tone: BadgeTone; label: string }> = {
-  open: { tone: "blue", label: "Open now" },
+const STATE_BADGE: Record<Exclude<PhaseState, "open">, { tone: BadgeTone; label: string }> = {
   upcoming: { tone: "neutral", label: "Upcoming" },
   closed: { tone: "neutral", label: "Closed" },
-  unscheduled: { tone: "neutral", label: "To be announced" },
 };
 
 function Marker({ state }: { state: PhaseState }) {
@@ -33,7 +31,7 @@ function Marker({ state }: { state: PhaseState }) {
 }
 
 function PhaseItem({ phase, last }: { phase: Phase; last: boolean }) {
-  const badge = STATE_BADGE[phase.state];
+  const badge = phase.state === "open" ? { tone: "blue" as const, label: phase.openLabel } : STATE_BADGE[phase.state];
   const countdown = phaseCountdown(phase);
   return (
     <li className="relative flex gap-4 pb-7 last:pb-0 sm:flex-col sm:gap-4 sm:pb-0">
@@ -63,7 +61,7 @@ export function EventTimeline({ event }: { event: BigEvent }) {
   const phases = eventPhases(event);
   return (
     <div>
-      <ol className="grid sm:grid-cols-3 sm:gap-6">
+      <ol className="grid sm:grid-cols-2 sm:gap-6">
         {phases.map((phase, index) => (
           <PhaseItem key={phase.key} phase={phase} last={index === phases.length - 1} />
         ))}

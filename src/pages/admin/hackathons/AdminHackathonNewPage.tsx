@@ -10,7 +10,7 @@ export default function AdminHackathonNewPage() {
 
   const submit = async (payload: BigEventWrite) => {
     const created = await create.mutateAsync(payload);
-    navigate(`/admin/hackathons/${created.id}?tab=cases`, { replace: true });
+    navigate(`/admin/hackathons/${created.id}`, { replace: true });
     return created;
   };
 

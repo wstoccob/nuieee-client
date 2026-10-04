@@ -34,7 +34,7 @@ function RegistrationUnavailable({ event }: { event: BigEvent }) {
 function Registration({ event }: { event: BigEvent }) {
   const [registered, setRegistered] = useState<Registered | null>(null);
 
-  if (registered) return <RegistrationSuccess eventTitle={event.title} registered={registered} />;
+  if (registered) return <RegistrationSuccess eventTitle={event.title} eventSlug={event.slug} registered={registered} />;
 
   return (
     <>

@@ -5,8 +5,7 @@ import { toast } from "sonner";
 import { errorMessage } from "@/api/client";
 import { TURNSTILE_SITE_KEY } from "@/config/hackathon";
 import { useRegisterTeam } from "@/hooks/useHackathons";
-import { saveTeamToken } from "@/lib/teamToken";
-import type { BigEvent } from "@/dtos/hackathon";
+import type { BigEvent, Member } from "@/dtos/hackathon";
 import { Alert } from "../ui/Alert";
 import { Button } from "../ui/Button";
 import { Card, CardHeader } from "../ui/Card";
@@ -18,10 +17,8 @@ import { clearDraft, loadDraft, saveDraft } from "./draft";
 import { emptyMember, emptyRegistration, registrationSchema, toRegistration, type RegistrationValues } from "./schema";
 
 export interface Registered {
-  token: string;
   teamName: string;
-  memberEmails: string[];
-  linkEmailed: boolean;
+  members: Member[];
 }
 
 interface RegistrationFormProps {
@@ -63,15 +60,10 @@ export function RegistrationForm({ event, onRegistered }: RegistrationFormProps)
   const onSubmit = async (values: RegistrationValues) => {
     setServerError(null);
     try {
-      const result = await registerTeam.mutateAsync(toRegistration(values, turnstileToken));
-      saveTeamToken(slug, result.accessToken);
+      const registration = toRegistration(values, turnstileToken);
+      await registerTeam.mutateAsync(registration);
       clearDraft(slug);
-      onRegistered({
-        token: result.accessToken,
-        teamName: values.teamName.trim(),
-        memberEmails: values.members.map((member) => member.email.trim()),
-        linkEmailed: result.linkEmailed,
-      });
+      onRegistered({ teamName: registration.teamName, members: registration.members });
     } catch (error) {
       const message = errorMessage(error, "Registration failed. Please check your connection and try again.");
       setServerError(message);

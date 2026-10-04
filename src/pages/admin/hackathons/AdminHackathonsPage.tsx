@@ -53,7 +53,7 @@ export default function AdminHackathonsPage() {
     <AdminShell>
       <PageHeader
         title="Hackathons"
-        description="Create events, publish cases and follow team registrations."
+        description="Create events, publish them and follow team registrations."
         actions={
           <ButtonLink to="/admin/hackathons/new">
             <PlusIcon />
