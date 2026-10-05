@@ -4,6 +4,7 @@ import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
 
 const adminNavLinks = [
     { label: 'Events', to: '/admin/events' },
+    { label: 'Hackathons', to: '/admin/hackathons' },
 ];
 
 const AdminHeader = () => {
