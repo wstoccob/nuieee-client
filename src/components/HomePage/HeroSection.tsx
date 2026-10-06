@@ -1,39 +1,41 @@
-﻿import ieeeHeroSection from '../../assets/icons/IEEE_mainscreen.svg';
+import ieeeWordmark from "@/assets/icons/IEEE_mainscreen.svg";
+import { useFeaturedHackathon } from "@/hooks/useHackathons";
+import { ButtonLink } from "@/components/hackathon/ui/Button";
+import { HackathonSpotlight } from "./HackathonSpotlight";
 
 export function HeroSection() {
-    return (
-        <section className="relative w-full min-h-[calc(100svh-112px)] lg:min-h-[calc(100svh-148px)] bg-black ">
-            {/* Background blur effect */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-[1165px] h-[662px] bg-blue-500/25 blur-[125px]" />
-              </div>
+  const { data: hackathon } = useFeaturedHackathon();
 
-            {/* Main Content */}
-            <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100svh-112px)] lg:min-h-[calc(100svh-148px)]">
-                <div className="-translate-y-[56px] lg:-translate-y-[74px] flex flex-col items-center text-center gap-2">
-                    {/* The contents need to be lifted by 112/2=56 and lg:114/2=74 to place them at the center*/}
-                    <img src={ieeeHeroSection} alt={'IEEE Hero Section'} className="block max-w-full h-auto m-0" />
+  return (
+    <section className="relative isolate flex flex-col items-center pt-6 pb-12 text-center sm:pt-12 sm:pb-16">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 flex justify-center">
+        <div className="h-[360px] w-full max-w-4xl rounded-full bg-hk-accent/30 blur-[110px] sm:h-[460px]" />
+      </div>
 
-                    {/* Student Branch Text */}
-                    <div className="relative">
-                        <div className="relative text-[30px] md:text-[50px] font-semibold uppercase leading-tight inline-block text-center">
-                            {/* Multiple text layers for glow effect */}
-                            <div className="absolute inset-0 text-ieee-lightblue [text-shadow:0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF]">
-                                Student Branch at<br />
-                                Nazarbayev University
-                            </div>
-                            <div className="absolute inset-0 text-ieee-lightblue [text-shadow:0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57)]">
-                                Student Branch at<br />
-                                Nazarbayev University
-                            </div>
-                            <div className="relative text-white">
-                                Student Branch at<br />
-                                Nazarbayev University
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
+      <img src={ieeeWordmark} alt="IEEE" width={656} height={328} className="h-auto w-[min(440px,72vw)]" />
+      <h1 className="text-glow mt-2 text-2xl font-semibold uppercase text-white sm:text-4xl">
+        Student Branch at
+        <br />
+        Nazarbayev University
+      </h1>
+      <p className="mt-5 max-w-xl text-base text-zinc-300 sm:text-lg">
+        Workshops, hackathons, field trips and networking events for engineering students at NU.
+      </p>
+
+      <div className="mt-10 w-full max-w-4xl">
+        {hackathon ? (
+          <HackathonSpotlight event={hackathon} />
+        ) : (
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <ButtonLink to="/events" size="lg">
+              See our events
+            </ButtonLink>
+            <ButtonLink to="/#about" variant="secondary" size="lg">
+              About us
+            </ButtonLink>
+          </div>
+        )}
+      </div>
+    </section>
+  );
 }

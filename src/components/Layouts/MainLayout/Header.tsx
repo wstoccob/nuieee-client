@@ -1,13 +1,22 @@
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
+import { cn } from '@/lib/utils';
+import { focusRing } from '@/components/hackathon/ui/styles';
 
 const navLinks = [
-  { label: 'HACKATHON 2.0', to: '/hackathon2' },
-  { label: 'ABOUT US', to: '/about' },
-  { label: 'EVENTS', to: '/events' },
-  { label: 'PODCASTS', to: '/podcasts' }
+  { label: 'About us', to: '/#about' },
+  { label: 'Events', to: '/events' },
+  { label: 'Hackathon', to: '/hackathon' },
+  { label: 'Podcasts', to: '/podcasts' }
 ];
+
+const linkClass = ({ isActive }: { isActive: boolean }) =>
+  cn(
+    'rounded-lg px-3 py-2 text-base font-medium transition-colors hover:text-white',
+    isActive ? 'text-white' : 'text-zinc-300',
+    focusRing
+  );
 
 // one source of truth for the “frosted” look
 const GLASS = "backdrop-blur-md bg-black/50";
@@ -24,31 +33,26 @@ export default function Header() {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-[9999] w-full overflow-x-clip ${GLASS}`}>
+    <header className={`sticky top-0 z-[9999] w-full ${GLASS}`}>
 
-      <div className="mx-auto flex h-16 lg:h-[100px] w-full max-w-[1440px] px-4 xl:px-[126px]">
+      <div className="mx-auto flex h-16 lg:h-20 w-full max-w-6xl items-center px-6">
 
-        <Link to="/" className="flex items-center h-16 lg:h-[100px] px-4 xl:px-[0px]">
-          <img src={ieeeIcon} alt="IEEE Icon" className="h-14 w-auto lg:h-18" />
+        <Link to="/" aria-label="NU IEEE home" className={cn('flex items-center rounded-lg', focusRing)}>
+          <img src={ieeeIcon} alt="" className="h-11 w-auto lg:h-12" />
         </Link>
 
         {/* Desktop inline nav */}
-        <nav className="hidden lg:flex flex-1 min-w-0 justify-center items-center gap-2 lg:gap-2.5 lg:pl-8">
+        <nav aria-label="Main" className="hidden lg:flex flex-1 justify-end items-center gap-1">
           {navLinks.map(({ label, to }) => (
-            <Link
-              key={to}
-              to={to}
-              className="px-3 lg:px-3 xl:px-5 py-2 lg:py-2 xl:py-3 rounded-md hover:bg-black/10"
-            >
-              <span className="text-white text-sm md:text-base lg:text-lg xl:text-[22px] font-bold whitespace-nowrap">
-                {label}
-              </span>
-            </Link>
+            <NavLink key={to} to={to} className={to.includes('#') ? linkClass({ isActive: false }) : linkClass}>
+              {label}
+            </NavLink>
           ))}
         </nav>
         {/* Mobile toggle (burger) */}
         <button
           className="ml-auto lg:hidden text-white px-3 py-2"
+          aria-label="Menu"
           aria-expanded={open}
           aria-controls="site-menu"
           onClick={() => setOpen(v => !v)}
@@ -63,14 +67,14 @@ export default function Header() {
         className={`absolute inset-x-0 top-full z-[9998] ${open ? 'block' : 'hidden'}`}
       >
         <div className={`${GLASS} overflow-x-clip`}>
-          <nav className="mx-auto max-w-[1440px] px-4 xl:px-[126px] py-2">
+          <nav aria-label="Main" className="mx-auto max-w-6xl px-6 py-2">
             {/* no borders/dividers -> continuous blur (no “hard lines”) */}
             <ul className="flex flex-col gap-1">
               {navLinks.map(({ label, to }) => (
                 <li key={to}>
                   <Link
                     to={to}
-                    className="block px-3 py-3 text-white rounded-md hover:bg-black/80"
+                    className={cn('block rounded-lg px-3 py-3 text-base font-medium text-white hover:bg-white/[0.06]', focusRing)}
                     onClick={() => setOpen(false)}
                   >
                     {label}

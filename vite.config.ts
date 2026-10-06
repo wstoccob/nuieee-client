@@ -21,8 +21,6 @@ export default defineConfig({
                 manualChunks: {
                     react: ["react", "react-dom", "react-router-dom"],
                     data: ["@tanstack/react-query", "axios"],
-                    carousel: ["react-slick", "slick-carousel"],
-                    motion: ["framer-motion"],
                 },
             },
         },
