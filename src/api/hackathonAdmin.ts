@@ -1,6 +1,8 @@
 import client from "./client";
 import type { AdminTeam, BigEventAdmin, BigEventWrite } from "@/dtos/hackathon";
 
+export type TeamsExportFormat = "xlsx" | "csv";
+
 export const hackathonAdminApi = {
   async listEvents(): Promise<BigEventAdmin[]> {
     const { data } = await client.get<BigEventAdmin[]>("/admin/big-events");
@@ -31,8 +33,8 @@ export const hackathonAdminApi = {
     return data;
   },
 
-  async teamsCsv(eventId: string): Promise<Blob> {
-    const { data } = await client.get<Blob>(`/admin/big-events/${eventId}/teams.csv`, {
+  async teamsExport(eventId: string, format: TeamsExportFormat): Promise<Blob> {
+    const { data } = await client.get<Blob>(`/admin/big-events/${eventId}/teams.${format}`, {
       responseType: "blob",
     });
     return data;

@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { errorMessage } from "@/api/client";
-import { hackathonAdminApi } from "@/api/hackathonAdmin";
+import { hackathonAdminApi, type TeamsExportFormat } from "@/api/hackathonAdmin";
 import { useAdminTeams, useDeleteTeam } from "@/hooks/useHackathonAdmin";
 import { formatDateTime } from "@/lib/datetime";
 import { saveBlob } from "@/lib/download";
@@ -13,6 +13,11 @@ import { Input } from "../ui/form";
 import { EmptyState, ErrorState, PageLoader } from "../ui/states";
 import { ChevronDownIcon, DownloadIcon, SearchIcon, TrashIcon, UsersIcon } from "../ui/icons";
 import { MemberRow } from "../MemberRow";
+
+const EXPORTS: { format: TeamsExportFormat; label: string }[] = [
+  { format: "xlsx", label: "Download Excel" },
+  { format: "csv", label: "Download CSV" },
+];
 
 function matches(team: AdminTeam, query: string): boolean {
   const haystack = [
@@ -102,7 +107,7 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
   const [query, setQuery] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [toDelete, setToDelete] = useState<AdminTeam | null>(null);
-  const [exporting, setExporting] = useState(false);
+  const [exporting, setExporting] = useState<TeamsExportFormat | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -115,14 +120,14 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
     return <ErrorState message={errorMessage(error, "Couldn't load the teams.")} onRetry={() => refetch()} retrying={isFetching} />;
   }
 
-  const exportCsv = async () => {
-    setExporting(true);
+  const download = async (format: TeamsExportFormat) => {
+    setExporting(format);
     try {
-      saveBlob(await hackathonAdminApi.teamsCsv(event.id), `${event.slug}-teams.csv`);
+      saveBlob(await hackathonAdminApi.teamsExport(event.id, format), `${event.slug}-teams.${format}`);
     } catch (err) {
-      toast.error(errorMessage(err, "Couldn't download the CSV."));
+      toast.error(errorMessage(err, "Couldn't download the file."));
     } finally {
-      setExporting(false);
+      setExporting(null);
     }
   };
 
@@ -156,10 +161,20 @@ export function TeamsTab({ event }: { event: BigEventAdmin }) {
             className="pl-10"
           />
         </div>
-        <Button variant="secondary" onClick={exportCsv} loading={exporting} disabled={teams.length === 0}>
-          {!exporting && <DownloadIcon />}
-          Download CSV
-        </Button>
+        <div className="grid grid-cols-2 gap-3 sm:flex">
+          {EXPORTS.map(({ format, label }) => (
+            <Button
+              key={format}
+              variant="secondary"
+              onClick={() => download(format)}
+              loading={exporting === format}
+              disabled={teams.length === 0 || exporting !== null}
+            >
+              {exporting !== format && <DownloadIcon />}
+              {label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {teams.length === 0 ? (
