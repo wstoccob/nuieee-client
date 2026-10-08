@@ -67,10 +67,11 @@ function EventDetails({ event }: { event: BigEvent }) {
   return (
     <div className="space-y-5">
       {event.heroImageUrl && (
+        // Shown whole, not cropped: event posters carry sponsor logos and dates near the edges.
         <img
           src={event.heroImageUrl}
-          alt=""
-          className="aspect-[2/1] w-full rounded-2xl border border-white/10 object-cover sm:aspect-[21/9]"
+          alt={`${event.title} poster`}
+          className="h-auto w-full rounded-2xl border border-white/10"
         />
       )}
 
