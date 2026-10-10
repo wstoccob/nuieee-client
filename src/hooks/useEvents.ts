@@ -27,6 +27,18 @@ export function useCreateEvent() {
   });
 }
 
+export function useUpdateEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: EventInput }) =>
+      eventsApi.update(id, payload),
+    onSuccess: (event) => {
+      queryClient.setQueryData([...EVENTS_KEY, event.id], event);
+      queryClient.invalidateQueries({ queryKey: EVENTS_KEY });
+    },
+  });
+}
+
 export function useDeleteEvent() {
   const queryClient = useQueryClient();
   return useMutation({

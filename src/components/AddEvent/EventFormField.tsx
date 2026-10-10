@@ -1,12 +1,16 @@
 interface Props {
   label: string;
+  htmlFor: string;
   error?: string;
   children: React.ReactNode;
 }
 
-export const EventFormField = ({ label, error, children }: Props) => (
+export const EventFormField = ({ label, htmlFor, error, children }: Props) => (
   <div>
-    <label className="block text-white text-xl font-inter font-semibold mb-2">
+    <label
+      htmlFor={htmlFor}
+      className="block text-white text-xl font-inter font-semibold mb-2"
+    >
       {label}
     </label>
     {children}

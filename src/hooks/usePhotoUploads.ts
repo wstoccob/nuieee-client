@@ -3,15 +3,16 @@ import imageCompression from "browser-image-compression";
 import { toast } from "sonner";
 import { storageApi } from "@/api/storage";
 import type { EventPhotoInput } from "@/dtos/event";
-import { 
-  COMPRESSION_OPTIONS, 
-  ALLOWED_PHOTO_TYPES, 
-  MAX_EVENT_PHOTOS 
+import {
+  COMPRESSION_OPTIONS,
+  ALLOWED_PHOTO_TYPES,
+  MAX_EVENT_PHOTOS,
 } from "@/config/constants";
 
 export interface PendingPhoto {
   id: string;
   file: File;
+  name: string;
   preview: string;
   altText: string;
   status: "compressing" | "ready";
@@ -19,7 +20,7 @@ export interface PendingPhoto {
   compressedSize?: number;
 }
 
-export function usePhotoUploads() {
+export function usePhotoUploads(existingPhotoCount = 0) {
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -76,7 +77,10 @@ export function usePhotoUploads() {
     if (valid.length === 0) return;
 
     setPhotos((current) => {
-      const availableSlots = Math.max(0, MAX_EVENT_PHOTOS - current.length);
+      const availableSlots = Math.max(
+        0,
+        MAX_EVENT_PHOTOS - existingPhotoCount - current.length
+      );
       if (valid.length > availableSlots) {
         toast.error(
           `Maximum ${MAX_EVENT_PHOTOS} photos allowed. Only adding the first ${availableSlots}.`
@@ -91,6 +95,7 @@ export function usePhotoUploads() {
         return {
           id,
           file,
+          name: file.name,
           preview: URL.createObjectURL(file),
           altText: "",
           status: "compressing",
@@ -100,7 +105,7 @@ export function usePhotoUploads() {
 
       return [...current, ...newItems];
     });
-  }, []);
+  }, [existingPhotoCount]);
 
   const removePhoto = useCallback((id: string) => {
     setPhotos((current) => {
