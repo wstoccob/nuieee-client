@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatDate } from "@/lib/datetime";
+import { formatDate, isFuture } from "@/lib/datetime";
 import { trackPointer } from "@/lib/pointerEffects";
 import { cn } from "@/lib/utils";
 import type { Event } from "@/dtos/event";
@@ -38,7 +38,7 @@ export function EventTile({ event, className }: { event: Event; className?: stri
             <time dateTime={event.startsAt} className="text-sm font-medium text-hk-accent-fg">
               {formatDate(event.startsAt)}
             </time>
-            {event.hasRegistrationLink && <Badge tone="green">Registration open</Badge>}
+            {event.hasRegistrationLink && isFuture(event.startsAt) && <Badge tone="green">Registration open</Badge>}
           </div>
           <h3 className="mt-1 line-clamp-2 text-lg font-semibold text-white">{event.title || "Untitled event"}</h3>
           {event.description && <p className="mt-2 line-clamp-2 text-sm text-zinc-400">{event.description}</p>}
