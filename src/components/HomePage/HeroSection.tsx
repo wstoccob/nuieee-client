@@ -1,34 +1,43 @@
-import ieeeWordmark from "@/assets/icons/IEEE_mainscreen.svg";
 import { useFeaturedHackathon } from "@/hooks/useHackathons";
 import { ButtonLink } from "@/components/hackathon/ui/Button";
+import { ArrowRightIcon } from "@/components/hackathon/ui/icons";
 import { HackathonSpotlight } from "./HackathonSpotlight";
+import { IeeeEmblem } from "./emblem/IeeeEmblem";
+import { Words } from "./Words";
+
+const TITLE = "IEEE Student Branch";
+const TITLE_PLACE = "at Nazarbayev University";
+const TITLE_WORD_COUNT = TITLE.split(" ").length;
 
 export function HeroSection() {
   const { data: hackathon } = useFeaturedHackathon();
 
   return (
-    <section className="relative isolate flex flex-col items-center pt-6 pb-12 text-center sm:pt-12 sm:pb-16">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 flex justify-center">
-        <div className="h-[360px] w-full max-w-4xl rounded-full bg-hk-accent/30 blur-[110px] sm:h-[460px]" />
-      </div>
+    <section className="relative isolate grid items-center gap-x-12 gap-y-8 pb-12 sm:pb-16 lg:min-h-[calc(100svh-10rem)] lg:grid-cols-[1.15fr_1fr]">
+      <div aria-hidden="true" className="blueprint-grid pointer-events-none absolute -inset-x-6 -top-12 bottom-0 -z-10 lg:-inset-x-32" />
 
-      <img src={ieeeWordmark} alt="IEEE" width={656} height={328} className="h-auto w-[min(440px,72vw)]" />
-      <h1 className="text-glow mt-2 text-2xl font-semibold uppercase text-white sm:text-4xl">
-        Student Branch at
-        <br />
-        Nazarbayev University
-      </h1>
-      <p className="mt-5 max-w-xl text-base text-zinc-300 sm:text-lg">
-        Workshops, hackathons, field trips and networking events for engineering students at NU.
-      </p>
+      <IeeeEmblem className="mx-auto w-56 sm:w-72 lg:order-2 lg:w-full lg:max-w-lg" />
 
-      <div className="mt-10 w-full max-w-4xl">
-        {hackathon ? (
-          <HackathonSpotlight event={hackathon} />
-        ) : (
-          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+      <div className="lg:order-1">
+        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-hk-accent-fg">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-hk-accent-fg" />
+          Astana, Kazakhstan
+        </p>
+        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl lg:text-6xl">
+          <Words text={TITLE} wordClassName="rise-word" />
+          <span className="text-zinc-400">
+            <Words text={TITLE_PLACE} wordClassName="rise-word" startIndex={TITLE_WORD_COUNT} />
+          </span>
+        </h1>
+        <p className="mt-5 max-w-xl text-base text-zinc-300 sm:text-lg">
+          Workshops, hackathons, field trips and networking events for engineering students at NU.
+        </p>
+
+        {!hackathon && (
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonLink to="/events" size="lg">
               See our events
+              <ArrowRightIcon />
             </ButtonLink>
             <ButtonLink to="/#about" variant="secondary" size="lg">
               About us
@@ -36,6 +45,12 @@ export function HeroSection() {
           </div>
         )}
       </div>
+
+      {hackathon && (
+        <div className="lg:order-3 lg:col-span-2">
+          <HackathonSpotlight event={hackathon} />
+        </div>
+      )}
     </section>
   );
 }

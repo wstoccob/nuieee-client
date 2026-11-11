@@ -1,6 +1,10 @@
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import type { PendingPhoto } from "@/hooks/usePhotoUploads";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/hackathon/ui/Button";
+import { Input } from "@/components/hackathon/ui/form";
+import { PlusIcon, TrashIcon } from "@/components/hackathon/ui/icons";
+import { focusRing } from "@/components/hackathon/ui/styles";
 
 interface Props {
   photos: PendingPhoto[];
@@ -22,13 +26,13 @@ export const PhotoDropzone = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
 
-  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrag = (e: React.DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -36,74 +40,76 @@ export const PhotoDropzone = ({
   };
 
   return (
-    <div>
-      <label className="block text-white text-xl font-inter font-semibold mb-2">
-        Photos ({photos.length}/{maxPhotos})
-      </label>
+    <div className="space-y-4">
+      <div className="flex items-baseline justify-between gap-2 text-sm font-medium text-zinc-200">
+        <span>Photos</span>
+        <span className="text-xs font-normal text-zinc-500 tabular-nums">
+          {photos.length} of {maxPhotos}
+        </span>
+      </div>
 
-      <div
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          onAdd(e.target.files);
+          e.target.value = "";
+        }}
+      />
+      <button
+        type="button"
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
-        className={`border-2 border-dashed rounded-lg p-8 mb-6 text-center transition-all cursor-pointer ${
-          dragActive
-            ? "border-ieee-blue bg-ieee-blue/10"
-            : "border-[#555] bg-black/30 hover:border-ieee-blue"
-        }`}
+        className={cn(
+          "flex w-full cursor-pointer flex-col items-center rounded-2xl border border-dashed px-6 py-8 text-center transition-colors",
+          dragActive ? "border-hk-accent-fg bg-hk-accent/10" : "border-white/15 hover:border-hk-accent-fg/60",
+          focusRing
+        )}
       >
-        <input
-          ref={inputRef}
-          type="file"
-          multiple
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            onAdd(e.target.files);
-            e.target.value = "";
-          }}
-        />
-        <div className="space-y-2">
-          <p className="text-white text-lg font-semibold">
-            Drag &amp; drop photos here
-          </p>
-          <p className="text-white/60 text-sm">or click to browse</p>
-        </div>
-      </div>
+        <span className="grid size-11 place-items-center rounded-full bg-white/[0.05] text-zinc-400">
+          <PlusIcon className="size-5" />
+        </span>
+        <span className="mt-3 text-base font-semibold text-white">Drag and drop photos here</span>
+        <span className="mt-1 text-sm text-zinc-400">or click to browse</span>
+      </button>
 
       {photos.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <ul className="grid gap-4 sm:grid-cols-2">
           {photos.map((photo) => (
-            <div
-              key={photo.id}
-              className="border-2 border-[#555] rounded-md overflow-hidden bg-black"
-            >
+            <li key={photo.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
               <img
                 src={photo.preview}
                 alt={photo.altText || photo.file.name}
-                className="w-full h-48 object-cover"
+                className="aspect-[16/10] w-full object-cover"
               />
-              <div className="p-4 space-y-3">
-                <input
+              <div className="space-y-2 p-3">
+                <Input
                   type="text"
                   value={photo.altText}
-                  onChange={(e) => onAltTextChange(photo.id, e.target.value)}
+                  aria-label={`Alt text for ${photo.file.name}`}
                   placeholder="Alt text (for accessibility)"
-                  className="w-full rounded-md border border-[#555] hover:border-ieee-blue bg-black text-white px-3 py-2 text-sm placeholder-white/40 transition-colors"
+                  onChange={(e) => onAltTextChange(photo.id, e.target.value)}
                 />
                 <Button
-                  type="button"
+                  variant="dangerGhost"
+                  size="sm"
+                  className="w-full"
                   onClick={() => onRemove(photo.id)}
                   disabled={disabled}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white text-sm uppercase"
                 >
+                  <TrashIcon />
                   Remove
                 </Button>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

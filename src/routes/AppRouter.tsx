@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { PageNotFound } from "@/components/PageNotFound";
+import { PageLoader } from "@/components/hackathon/ui/states";
 import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/auth/LoginPage";
 import EventsListPage from "@/pages/event/EventsListPage";
@@ -22,8 +23,8 @@ const TeamRegistrationPage = lazy(() => import("@/pages/hackathon/TeamRegistrati
 const PodcastsPage = lazy(() => import("@/pages/PodcastsPage"));
 
 const RouteFallback = () => (
-  <div className="min-h-screen bg-black flex items-center justify-center">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-ieee-blue" />
+  <div className="hk-root grid min-h-screen place-items-center bg-black">
+    <PageLoader />
   </div>
 );
 

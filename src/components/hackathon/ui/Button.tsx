@@ -41,3 +41,15 @@ export function ButtonLink({
 }: ComponentProps<typeof Link> & ButtonVariants) {
   return <Link className={cn(buttonStyles({ variant, size }), className)} {...props} />;
 }
+
+/** For links that leave the site; opens in a new tab. */
+export function ButtonAnchor({ variant, size, className, ...props }: ComponentProps<"a"> & ButtonVariants) {
+  return (
+    <a
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(buttonStyles({ variant, size }), className)}
+      {...props}
+    />
+  );
+}

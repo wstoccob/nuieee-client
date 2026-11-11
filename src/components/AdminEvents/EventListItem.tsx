@@ -1,14 +1,7 @@
-import { Button } from "../ui/button";
-import { useNavigate } from "react-router-dom";
 import type { Event } from "@/dtos/event";
-// Lightweight date formatting (avoid extra dependency)
-const formatDateTime = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleString(undefined, {
-    year: 'numeric', month: 'short', day: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
-};
+import { formatDateTime } from "@/lib/datetime";
+import { Button, ButtonLink } from "@/components/hackathon/ui/Button";
+import { TrashIcon } from "@/components/hackathon/ui/icons";
 
 interface Props {
   event: Event;
@@ -16,43 +9,25 @@ interface Props {
   deleting?: boolean;
 }
 
-export const EventListItem: React.FC<Props> = ({ event, onDelete, deleting }) => {
-  const navigate = useNavigate();
-
-  const handleOpen = () => navigate(`/events/${event.id}`);
-  const handleDelete = () => onDelete(event.id);
-
+export function EventListItem({ event, onDelete, deleting }: Props) {
   return (
-    <div className="group rounded-lg border-2 border-white bg-black p-6 md:p-8 flex flex-col md:flex-row gap-6 md:items-center hover:border-ieee-blue transition-all duration-300">
-      <div className="flex-1 min-w-0">
-        <h3 className="text-[clamp(24px,3vw,35px)] font-inter font-semibold text-white mb-2 uppercase">
-          {event.title || "Untitled Event"}
-        </h3>
-        <p className="text-ieee-blue text-lg md:text-xl font-semibold mb-3">
+    <li className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+      <div className="min-w-0">
+        <h2 className="text-lg font-semibold text-white">{event.title || "Untitled event"}</h2>
+        <time dateTime={event.startsAt} className="mt-1 block text-sm font-medium text-hk-accent-fg">
           {formatDateTime(event.startsAt)}
-        </p>
-        {event.description && (
-          <p className="text-white/80 text-base md:text-lg line-clamp-2">
-            {event.description}
-          </p>
-        )}
+        </time>
+        {event.description && <p className="mt-2 line-clamp-2 text-sm text-zinc-400">{event.description}</p>}
       </div>
-      <div className="flex items-center gap-3 md:flex-col md:gap-4">
-        <Button 
-          variant="outline" 
-          onClick={handleOpen}
-          className="border-ieee-blue text-ieee-blue hover:bg-ieee-blue hover:text-white font-semibold uppercase px-6 py-2"
-        >
+      <div className="flex shrink-0 gap-2">
+        <ButtonLink to={`/events/${event.id}`} variant="secondary">
           View
-        </Button>
-        <Button
-          onClick={handleDelete}
-          disabled={deleting}
-          className="bg-red-600 hover:bg-red-700 text-white font-semibold uppercase px-6 py-2"
-        >
-          {deleting ? "Deleting..." : "Delete"}
+        </ButtonLink>
+        <Button variant="dangerGhost" loading={deleting} onClick={() => onDelete(event.id)}>
+          {!deleting && <TrashIcon />}
+          Delete
         </Button>
       </div>
-    </div>
+    </li>
   );
-};
+}

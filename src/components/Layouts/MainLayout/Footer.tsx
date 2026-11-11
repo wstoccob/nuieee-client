@@ -1,92 +1,79 @@
-﻿import { Link } from "react-router-dom"
-import linkedinIcon from '../../../assets/icons/linkedin_icon.svg';
-import youtubeIcon from '../../../assets/icons/youtube_icon.svg';
-import instagramIcon from '../../../assets/icons/instagram_icon.svg';
-import tiktokIcon from '../../../assets/icons/tiktok_icon.svg';
-import telegramIcon from '../../../assets/icons/telegram_icon.svg';
-import ieeeLogo from '../../../assets/icons/ieee_logo.svg';
+﻿import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
+import { cn } from '@/lib/utils';
+import { focusRing } from '@/components/hackathon/ui/styles';
 
-export default function Component() {
-    return (
-        <footer className="bg-[#00629c] text-black px-8 py-12">
-            <div className="max-w-7xl mx-auto">
-                {/* Main footer content */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 text-center">
-                    <div>
-                        <h3 className="text-black font-semibold mb-6 text-lg">RELATED</h3>
-                        <div className="space-y-4">
-                            <Link to="https://signalprocessingsociety.org/" className="block text-black underline hover:no-underline hover:text-black transition-all">
-                                IEEE Signal Processing Society
-                            </Link>
-                            <Link to="https://sites.google.com/nu.edu.kz/asp-lab" className="block text-black underline hover:no-underline transition-all">
-                                ASP-LAB Website
-                            </Link>
-                            <Link to="https://nu.edu.kz/" className="block text-black underline hover:no-underline transition-all">
-                                Nazarbayev University Website
-                            </Link>
-                        </div>
-                    </div>
+const LINK_GROUPS = [
+  {
+    title: 'Related',
+    links: [
+      { label: 'IEEE Signal Processing Society', href: 'https://signalprocessingsociety.org/' },
+      { label: 'ASP-LAB', href: 'https://sites.google.com/nu.edu.kz/asp-lab' },
+      { label: 'Nazarbayev University', href: 'https://nu.edu.kz/' },
+    ],
+  },
+  {
+    title: 'Global',
+    links: [
+      { label: 'IEEE Official', href: 'https://www.ieee.org/' },
+      { label: 'IEEE Xplore', href: 'https://ieeexplore.ieee.org/Xplore/home.jsp' },
+      { label: 'IEEE Membership', href: 'https://www.ieee.org/membership' },
+    ],
+  },
+  {
+    title: 'Follow',
+    links: [
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/company/ieeenu/' },
+      { label: 'YouTube', href: 'https://youtube.com/@nu_ieee' },
+      { label: 'Instagram', href: 'https://www.instagram.com/nuieee_sb' },
+      { label: 'TikTok', href: 'https://www.tiktok.com/@nu_ieee' },
+      { label: 'Telegram', href: 'https://t.me/nu_ieee' },
+    ],
+  },
+];
 
-                    {/* Global Section */}
-                    <div>
-                        <h3 className="text-black font-semibold mb-6 text-lg">GLOBAL</h3>
-                        <div className="space-y-4">
-                            <Link to="https://www.ieee.org/" className="block text-black underline hover:no-underline transition-all">
-                                IEEE Official
-                            </Link>
-                            <Link to="https://ieeexplore.ieee.org/Xplore/home.jsp" className="block text-black underline hover:no-underline transition-all">
-                                IEEE Xplore
-                            </Link>
-                            <Link to="https://www.ieee.org/membership" className="block text-black underline hover:no-underline transition-all">
-                                IEEE Membership
-                            </Link>
-                        </div>
-                    </div>
+const linkClass = cn(
+  'inline-flex min-h-11 items-center rounded-lg text-sm text-zinc-300 transition-colors hover:text-white',
+  focusRing
+);
 
-                    {/* Contact Section */}
-                    <div>
-                        <h3 className="text-black font-semibold mb-6 text-lg">CONTACT</h3>
-                        <div className="space-y-4">
-                            <Link
-                                to="mailto:ieee@nu.edu.kz"
-                                className="block text-black underline hover:no-underline transition-all"
-                            >
-                                ieee@nu.edu.kz
-                            </Link>
-
-                            {/* Social Media Icons */}
-                            <div className="flex justify-center gap-3 mt-6">
-                                <Link to="https://www.linkedin.com/company/ieeenu/" className="text-black hover:opacity-70 transition-opacity">
-                                    <img src={linkedinIcon} alt={"LinkedIn Icon"} />
-                                </Link>
-                                <Link to="https://youtube.com/@nu_ieee" className="text-black hover:opacity-70 transition-opacity">
-                                    <img src={youtubeIcon} alt={"YouTube Icon"} />
-                                </Link>
-                                <Link to="https://www.instagram.com/nuieee_sb" className="text-black hover:opacity-70 transition-opacity">
-                                    <img src={instagramIcon} alt={"Instagram Icon"} />
-                                </Link>
-                                <Link to="https://www.tiktok.com/@nu_ieee" className="text-black hover:opacity-70 transition-opacity">
-                                    <img src={tiktokIcon} alt={"Tiktok Icon"} />
-                                </Link>
-                                <Link to="https://t.me/nu_ieee" className="text-black hover:opacity-70 transition-opacity">
-                                    <img src={telegramIcon} alt={"Telegram Icon"} />
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row justify-between items-center md:items-end pt-8 border-t border-black/20 text-center md:text-right">
-                    {/* IEEE Logo */}
-                    <img src={ieeeLogo} alt={"Ieee Logo"} className="mb-4 md:mb-0" />
-
-                    {/* Copyright */}
-                    <div className="text-black">
-                        <div className="font-semibold mb-1">© 2025 IEEE Student Branch</div>
-                        <div className="text-sm">Nazarbayev University, 53 Kabanbay Batyr Avenue, Astana, Kazakhstan.</div>
-                    </div>
-                </div>
+export default function Footer() {
+  return (
+    <footer className="hk-root border-t border-white/10 px-6 pt-12 pb-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          <div className="col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-3">
+              <img src={ieeeIcon} alt="" width={54} height={55} loading="lazy" className="h-10 w-auto" />
+              <p className="text-base font-semibold text-white">NU IEEE Student Branch</p>
             </div>
-        </footer>
-    )
+            <p className="mt-4 max-w-xs text-sm text-zinc-400">
+              Nazarbayev University, 53 Kabanbay Batyr Avenue, Astana, Kazakhstan.
+            </p>
+            <a href="mailto:ieee@nu.edu.kz" className={cn(linkClass, 'mt-2 text-hk-accent-fg')}>
+              ieee@nu.edu.kz
+            </a>
+          </div>
+
+          {LINK_GROUPS.map(({ title, links }) => (
+            <nav key={title} aria-label={title}>
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500">{title}</h2>
+              <ul className="mt-2">
+                {links.map(({ label, href }) => (
+                  <li key={href}>
+                    <a href={href} target="_blank" rel="noreferrer" className={linkClass}>
+                      {label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+
+        <p className="mt-10 border-t border-white/10 pt-6 text-xs text-zinc-500">
+          © {new Date().getFullYear()} IEEE Student Branch at Nazarbayev University
+        </p>
+      </div>
+    </footer>
+  );
 }

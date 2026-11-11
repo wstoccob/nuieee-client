@@ -1,152 +1,124 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authApi } from "@/api/auth";
 import { errorMessage } from "@/api/client";
 import { useAuth } from "@/auth/useAuth";
-import IEEE_mainscreen from '../../assets/icons/IEEE_mainscreen.svg';
+import ieeeIcon from "@/assets/icons/ieee_icon.svg";
+import { cn } from "@/lib/utils";
+import { Alert } from "@/components/hackathon/ui/Alert";
+import { Button } from "@/components/hackathon/ui/Button";
+import { Card } from "@/components/hackathon/ui/Card";
+import { Checkbox, Field, Input } from "@/components/hackathon/ui/form";
+import { focusRing } from "@/components/hackathon/ui/styles";
+
+type CapsLockEvent = React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>;
 
 const LoginPage = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [capsLockActive, setCapsLockActive] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [capsLockActive, setCapsLockActive] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        setError("");
-        setIsLoading(true);
+    setError("");
+    setIsLoading(true);
 
-        try {
-            const { accessToken } = await authApi.login(username, password);
-            login(accessToken, rememberMe);
+    try {
+      const { accessToken } = await authApi.login(username, password);
+      login(accessToken, rememberMe);
 
-            const from = (location.state as { from?: Location })?.from?.pathname;
-            navigate(from ?? "/admin", { replace: true });
-        } catch (err) {
-            setError(errorMessage(err, "Invalid username or password"));
-        } finally {
-            setIsLoading(false);
-        }
-    };
+      const from = (location.state as { from?: Location })?.from?.pathname;
+      navigate(from ?? "/admin", { replace: true });
+    } catch (err) {
+      setError(errorMessage(err, "Invalid username or password"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const checkCapsLock = (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>) => {
-        setCapsLockActive(e.getModifierState("CapsLock"));
-    };
+  const checkCapsLock = (e: CapsLockEvent) => setCapsLockActive(e.getModifierState("CapsLock"));
 
-    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUsername(e.target.value);
-        if (error) setError("");
-    };
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+    if (error) setError("");
+  };
 
-    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(e.target.value);
-        if (error) setError("");
-    };
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError("");
+  };
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-black p-8 font-sans">
-            <div className="w-full max-w-5xl flex flex-col md:flex-row items-center justify-center gap-12 min-h-[500px]">
-                {/* Left Side: Image & Text Container */}
-                {/* Changed to flex-col and added gap-6 to create space between the image and text */}
-                <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
-                    <img
-                        src={IEEE_mainscreen}
-                        alt="Login visual"
-                        className="w-full max-w-md object-cover rounded-lg shadow-2xl"
-                    />
+  return (
+    <main className="hk-root relative isolate grid min-h-screen place-items-center overflow-hidden bg-black px-6 py-16">
+      <div aria-hidden="true" className="blueprint-grid pointer-events-none absolute inset-0 -z-10" />
 
-                    {/* Glowing Text - Now nested inside the left side container */}
-                    <div className="relative">
-                        <div className="relative text-[22px] md:text-[36px] font-semibold uppercase leading-tight inline-block text-center">
-                            {/* Multiple text layers for glow effect */}
-                            <div className="absolute inset-0 text-ieee-lightblue [text-shadow:0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF,0_0_4px_#2769BF]">
-                                Student Branch at<br />
-                                Nazarbayev University
-                            </div>
-                            <div className="absolute inset-0 text-ieee-lightblue [text-shadow:0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57),0_0_8.5px_rgba(39,105,191,0.57)]">
-                                Student Branch at<br />
-                            Nazarbayev University
-                            </div>
-                            <div className="relative text-white">
-                                Student Branch at<br />
-                                Nazarbayev University
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div className="w-full max-w-sm animate-page-in motion-reduce:animate-none">
+        <Link to="/" aria-label="NU IEEE home" className={cn("mx-auto flex w-fit items-center gap-3 rounded-lg", focusRing)}>
+          <img src={ieeeIcon} alt="" width={54} height={55} className="h-10 w-auto" />
+          <span className="text-base font-semibold text-white">NU IEEE</span>
+        </Link>
 
-                {/* Right Side: Login Form Container */}
-                <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
-                    <h2 className="text-6xl font-inter font-bold uppercase text-ieee-blue leading-none mb-6">Login</h2>
+        <Card className="mt-8">
+          <h1 className="text-2xl font-semibold text-white">Sign in</h1>
+          <p className="mt-1 text-sm text-zinc-400">For NU IEEE board members.</p>
 
-                    <form onSubmit={handleLogin} className="bg-[#1a1a1a] p-6 rounded-lg w-80 shadow-lg flex flex-col gap-2">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-200">Username</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 bg-[#0f0f0f] border border-gray-600 rounded text-white focus:outline-none focus:border-gray-400 transition-colors"
-                                value={username}
-                                onChange={handleUsernameChange}
-                                onKeyUp={checkCapsLock}
-                                onClick={checkCapsLock}
-                                required
-                                disabled={isLoading}
-                            />
-                        </div>
+          <form onSubmit={handleLogin} className="mt-6 space-y-4">
+            <Field label="Username">
+              {(control) => (
+                <Input
+                  {...control}
+                  type="text"
+                  autoComplete="username"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  onKeyUp={checkCapsLock}
+                  onClick={checkCapsLock}
+                  required
+                  disabled={isLoading}
+                />
+              )}
+            </Field>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-200">Password</label>
-                            <input
-                                type="password"
-                                className="w-full p-2 bg-[#0f0f0f] border border-gray-600 rounded text-white focus:outline-none focus:border-gray-400 transition-colors"
-                                value={password}
-                                onChange={handlePasswordChange}
-                                onKeyUp={checkCapsLock}
-                                onClick={checkCapsLock}
-                                required
-                                disabled={isLoading}
-                            />
-                            {capsLockActive && (
-                                <p className="text-red-500 text-sm">Caps Lock is ON</p>
-                            )}
-                        </div>
+            <Field label="Password" hint={capsLockActive && <span className="text-amber-300">Caps Lock is on</span>}>
+              {(control) => (
+                <Input
+                  {...control}
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  onKeyUp={checkCapsLock}
+                  onClick={checkCapsLock}
+                  required
+                  disabled={isLoading}
+                />
+              )}
+            </Field>
 
-                        <div className="flex items-center gap-1">
-                            <input
-                                type="checkbox"
-                                id="rememberMe"
-                                className="w-4 h-4 text-ieee-blue bg-[#0f0f0f] border-gray-600 rounded focus:ring-[#3b719f] focus:ring-2 cursor-pointer"
-                                checked={rememberMe}
-                                onChange={(e) => setRememberMe(e.target.checked)}
-                                disabled={isLoading}
-                            />
-                            <label htmlFor="rememberMe" className="text-sm text-gray-200 cursor-pointer select-none">
-                                Remember me
-                            </label>
-                        </div>
+            <Checkbox
+              label="Remember me"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              disabled={isLoading}
+            />
 
-                        {/* Error Message */}
-                        {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <Alert tone="error">{error}</Alert>}
 
-                        {/* Updated Button with Loading State */}
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className={`w-full bg-ieee-blue hover:bg-ieee-blue/50 text-white py-2 rounded transition duration-200 font-medium mt-2 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                        >
-                            {isLoading ? "Logging in..." : "Login"}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
+            <Button type="submit" size="lg" loading={isLoading} className="w-full">
+              Sign in
+            </Button>
+          </form>
+        </Card>
+      </div>
+    </main>
+  );
 };
 
 export default LoginPage;

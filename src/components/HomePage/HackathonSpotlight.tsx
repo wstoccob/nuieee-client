@@ -1,6 +1,7 @@
 import type { BigEvent } from "@/dtos/hackathon";
 import { formatDateRange, formatDateTime, formatRelative, isFuture } from "@/lib/datetime";
 import { teamSizeLabel } from "@/lib/hackathonPhases";
+import { trackPointer } from "@/lib/pointerEffects";
 import { Badge } from "@/components/hackathon/ui/Badge";
 import { ButtonLink } from "@/components/hackathon/ui/Button";
 import { ArrowRightIcon, CalendarIcon, ClockIcon, UsersIcon } from "@/components/hackathon/ui/icons";
@@ -24,7 +25,8 @@ export function HackathonSpotlight({ event }: { event: BigEvent }) {
   return (
     <section
       aria-labelledby="hackathon-spotlight"
-      className="w-full rounded-2xl border border-hk-accent-fg/25 bg-black/60 p-5 text-left backdrop-blur-sm sm:p-8"
+      onPointerMove={trackPointer}
+      className="spotlight w-full rounded-2xl border border-hk-accent-fg/25 bg-black/60 p-5 text-left backdrop-blur-sm sm:p-8"
     >
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">

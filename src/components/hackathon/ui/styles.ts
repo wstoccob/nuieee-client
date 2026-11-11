@@ -1,7 +1,17 @@
 import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 export const focusRing =
   "outline-none focus-visible:ring-2 focus-visible:ring-hk-accent-fg/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black";
+
+export const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  cn(
+    "relative flex h-11 items-center rounded-lg px-3 text-sm font-medium transition-colors hover:text-white",
+    "after:absolute after:inset-x-3 after:bottom-1.5 after:h-px after:origin-left after:bg-hk-accent-fg",
+    "after:transition-transform after:duration-200 motion-reduce:after:transition-none",
+    isActive ? "text-white after:scale-x-100" : "text-zinc-400 after:scale-x-0",
+    focusRing
+  );
 
 export const buttonStyles = cva(
   `inline-flex cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${focusRing}`,

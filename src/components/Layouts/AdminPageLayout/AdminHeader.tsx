@@ -1,64 +1,54 @@
-﻿import { Link, useNavigate } from 'react-router-dom';
+﻿import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from "@/auth/useAuth";
 import ieeeIcon from '../../../assets/icons/ieee_icon.svg';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/hackathon/ui/Badge';
+import { Button, ButtonLink } from '@/components/hackathon/ui/Button';
+import { focusRing, navLinkClass } from '@/components/hackathon/ui/styles';
 
 const adminNavLinks = [
-    { label: 'Events', to: '/admin/events' },
-    { label: 'Hackathons', to: '/admin/hackathons' },
+  { label: 'Events', to: '/admin/events' },
+  { label: 'Hackathons', to: '/admin/hackathons' },
 ];
 
 const AdminHeader = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-    const redirectToLoginPage = () => navigate('/auth/login');
+  const handleLogout = () => {
+    logout();
+    navigate('/auth/login', { replace: true });
+  };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/auth/login', { replace: true });
-    };
+  return (
+    <header className="hk-root sticky top-0 z-40 w-full border-b border-white/10 bg-black/70 backdrop-blur-md">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-1 px-4 sm:px-6">
+        <Link to="/admin" aria-label="Admin home" className={cn('mr-auto flex items-center gap-3 rounded-lg', focusRing)}>
+          <img src={ieeeIcon} alt="" width={54} height={55} className="h-9 w-auto" />
+          <span className="hidden text-base font-semibold text-white sm:inline">NU IEEE</span>
+          <Badge tone="blue" className="hidden sm:inline-flex">Admin</Badge>
+        </Link>
 
-    return (
-        <header className="w-full bg-black flex justify-center">
-            <div className="hidden lg:flex w-full max-w-[1440px] h-[100px] px-4 xl:px-[126px] items-center">
-                <nav className="flex w-full items-center gap-2">
-                    {/* Logo */}
-                    <Link to="/admin" className="mr-auto">
-                        <img src={ieeeIcon} alt="IEEE Icon" className='className="h-14 w-auto lg:h-18' />
-                    </Link>
+        <nav aria-label="Admin" className="flex items-center gap-1">
+          {adminNavLinks.map(({ label, to }) => (
+            <NavLink key={to} to={to} className={navLinkClass}>
+              {label}
+            </NavLink>
+          ))}
+        </nav>
 
-                    {/* Navigation Items */}
-                    <div className="flex items-center">
-                        {adminNavLinks.map(({ label, to }) => (
-                            <Link
-                                key={to}
-                                to={to}
-                                className="px-3 md:px-5 py-3 md:py-4 rounded-md hover:bg-gray-800 transition-colors"
-                            >
-                <span className="text-white text-sm md:text-lg lg:text-[22px] font-bold font-inter whitespace-nowrap">
-                  {label}
-                </span>
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Login/Logout */}
-                    <div className="ml-auto">
-                        {user ? (
-                            <button onClick={handleLogout} className="text-white text-sm md:text-lg lg:text-[22px] font-bold font-inter  transition-colors">
-                                Log out
-                            </button>
-                        ) : (
-                            <button onClick={redirectToLoginPage} className="text-white text-sm md:text-lg lg:text-[22px] font-bold font-inter  transition-colors">
-                                Log in
-                            </button>
-                        )}
-                    </div>
-
-                </nav>
-            </div>
-        </header>
-    );
+        {user ? (
+          <Button variant="ghost" size="md" onClick={handleLogout}>
+            Log out
+          </Button>
+        ) : (
+          <ButtonLink variant="ghost" size="md" to="/auth/login">
+            Log in
+          </ButtonLink>
+        )}
+      </div>
+    </header>
+  );
 };
 
 export default AdminHeader;

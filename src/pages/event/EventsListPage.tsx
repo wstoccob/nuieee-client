@@ -1,100 +1,66 @@
 import { useMemo, useState } from "react";
-import { MainLayout } from "@/components/Layouts/MainLayout/MainLayout";
 import { useEvents } from "@/hooks/useEvents";
 import { errorMessage } from "@/api/client";
-import { EventPreviewCard } from "@/components/Event/EventPreviewCard";
-import { EventsError, EventsSpinner } from "@/components/Event/EventsState";
+import type { Event } from "@/dtos/event";
+import { EventTile, EventTileSkeleton } from "@/components/Event/EventTile";
+import { PageHeader, PublicShell } from "@/components/hackathon/Shells";
+import { EmptyState, ErrorState } from "@/components/hackathon/ui/states";
+import { TabPanel, Tabs, type TabItem } from "@/components/hackathon/ui/Tabs";
+import { CalendarIcon } from "@/components/hackathon/ui/icons";
+
+type Filter = "all" | "upcoming" | "past";
+
+const FILTERS: TabItem<Filter>[] = [
+  { id: "all", label: "All" },
+  { id: "upcoming", label: "Upcoming" },
+  { id: "past", label: "Past" },
+];
+
+const EMPTY_TITLES: Record<Filter, string> = {
+  all: "No events yet",
+  upcoming: "No upcoming events scheduled",
+  past: "No past events",
+};
+
+const SKELETON_COUNT = 6;
+const startTime = (event: Event) => new Date(event.startsAt).getTime();
+
+function filterEvents(events: Event[], filter: Filter): Event[] {
+  const now = Date.now();
+  const newestFirst = [...events].sort((a, b) => startTime(b) - startTime(a));
+  if (filter === "all") return newestFirst;
+  return newestFirst.filter((event) => (filter === "upcoming" ? startTime(event) >= now : startTime(event) < now));
+}
 
 export default function EventsListPage() {
-  const { data: events = [], isPending, error } = useEvents();
-  const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
-
-  const filteredEvents = useMemo(() => {
-    const now = Date.now();
-    const sorted = [...events].sort(
-      (a, b) => new Date(b.startsAt).getTime() - new Date(a.startsAt).getTime()
-    );
-    if (filter === "all") return sorted;
-    return sorted.filter((event) => {
-      const starts = new Date(event.startsAt).getTime();
-      return filter === "upcoming" ? starts >= now : starts < now;
-    });
-  }, [events, filter]);
+  const { data: events = [], isPending, error, refetch, isFetching } = useEvents();
+  const [filter, setFilter] = useState<Filter>("all");
+  const visible = useMemo(() => filterEvents(events, filter), [events, filter]);
 
   return (
-    <MainLayout>
-      <section className="bg-black text-white py-16 lg:py-24 min-h-screen">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="mb-12 md:mb-16">
-            <h1 className="text-[clamp(60px,8vw,100px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-6">
-              events
-            </h1>
-            <p className="text-white text-[clamp(18px,2.5vw,30px)] font-inter font-semibold leading-[1.2] max-w-4xl">
-              Discover our upcoming workshops, hackathons, talks, and networking events designed to inspire and connect the engineering community at Nazarbayev University.
-            </p>
-          </div>
-
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap gap-4 mb-12">
-            <button
-              onClick={() => setFilter("all")}
-              className={`px-6 py-3 font-inter font-semibold uppercase text-sm md:text-base rounded-md border-2 transition-all ${
-                filter === "all"
-                  ? "bg-ieee-blue border-ieee-blue text-white"
-                  : "bg-transparent border-white text-white hover:border-ieee-blue hover:text-ieee-blue"
-              }`}
-            >
-              All Events
-            </button>
-            <button
-              onClick={() => setFilter("upcoming")}
-              className={`px-6 py-3 font-inter font-semibold uppercase text-sm md:text-base rounded-md border-2 transition-all ${
-                filter === "upcoming"
-                  ? "bg-ieee-blue border-ieee-blue text-white"
-                  : "bg-transparent border-white text-white hover:border-ieee-blue hover:text-ieee-blue"
-              }`}
-            >
-              Upcoming
-            </button>
-            <button
-              onClick={() => setFilter("past")}
-              className={`px-6 py-3 font-inter font-semibold uppercase text-sm md:text-base rounded-md border-2 transition-all ${
-                filter === "past"
-                  ? "bg-ieee-blue border-ieee-blue text-white"
-                  : "bg-transparent border-white text-white hover:border-ieee-blue hover:text-ieee-blue"
-              }`}
-            >
-              Past Events
-            </button>
-          </div>
-
-          {isPending && <EventsSpinner />}
-
-          {error && <EventsError message={errorMessage(error, "Failed to load events")} />}
-
-          {/* Empty State */}
-          {!isPending && !error && filteredEvents.length === 0 && (
-            <div className="text-center py-32 border-2 border-dashed border-white/30 rounded-lg">
-              <p className="text-white text-2xl font-inter font-bold mb-4">
-                {filter === "upcoming" && "No upcoming events scheduled."}
-                {filter === "past" && "No past events found."}
-                {filter === "all" && "No events available yet."}
-              </p>
-              <p className="text-white/60 text-lg">Check back soon for updates!</p>
-            </div>
-          )}
-
-          {/* Events Grid */}
-          {!isPending && !error && filteredEvents.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredEvents.map((event) => (
-                <EventPreviewCard key={event.id} event={event} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-    </MainLayout>
+    <PublicShell size="wide">
+      <PageHeader
+        title="Events"
+        description="Workshops, hackathons, talks and networking events for the engineering community at Nazarbayev University."
+      />
+      <Tabs tabs={FILTERS} value={filter} idPrefix="events" onChange={setFilter} />
+      <TabPanel idPrefix="events" id={filter}>
+        {error ? (
+          <ErrorState
+            message={errorMessage(error, "Couldn't load events.")}
+            onRetry={() => refetch()}
+            retrying={isFetching}
+          />
+        ) : !isPending && visible.length === 0 ? (
+          <EmptyState icon={<CalendarIcon />} title={EMPTY_TITLES[filter]} description="Check back soon for updates." />
+        ) : (
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {isPending
+              ? Array.from({ length: SKELETON_COUNT }, (_, i) => <EventTileSkeleton key={i} />)
+              : visible.map((event) => <EventTile key={event.id} event={event} />)}
+          </ul>
+        )}
+      </TabPanel>
+    </PublicShell>
   );
 }

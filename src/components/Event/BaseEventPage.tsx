@@ -1,88 +1,75 @@
-import type { Event } from "@/dtos/event";
-const formatDateTime = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleString(undefined, {
-    year: 'numeric', month: 'short', day: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  });
-};
-import ieeeSmallBlueIcon from "@/assets/icons/ieee_small_blue_icon.svg";
-import { Button } from "@/components/ui/button";
+import type { Event, EventPhoto } from "@/dtos/event";
+import { formatDateTime } from "@/lib/datetime";
+import { cn } from "@/lib/utils";
+import { BackLink } from "@/components/hackathon/Shells";
+import { ButtonAnchor } from "@/components/hackathon/ui/Button";
+import { ExternalIcon } from "@/components/hackathon/ui/icons";
+import { focusRing } from "@/components/hackathon/ui/styles";
 
-interface Props {
-  event: Event;
+function GalleryPhoto({ photo }: { photo: EventPhoto }) {
+  return (
+    <li className="reveal">
+      <figure>
+        {/* Thumbnails are cropped, so the link opens the whole photo. */}
+        <a
+          href={photo.photoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn("block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]", focusRing)}
+        >
+          <img
+            src={photo.photoUrl}
+            alt={photo.altText || "Event photo"}
+            loading="lazy"
+            className="aspect-[4/3] w-full object-cover transition-transform duration-300 hover:scale-[1.03] motion-reduce:transition-none"
+          />
+        </a>
+        {photo.altText && <figcaption className="mt-2 text-sm text-zinc-400">{photo.altText}</figcaption>}
+      </figure>
+    </li>
+  );
 }
 
-export const BaseEventPage: React.FC<Props> = ({ event }) => {
+export function BaseEventPage({ event }: { event: Event }) {
+  const photos = event.photos.filter((photo) => photo.photoUrl);
+
   return (
-    <section className="bg-black text-white py-16 lg:py-24">
-      <div className="container mx-auto px-4">
-        {/* Event Title Section */}
-        <div className="mb-12">
-          <h1 className="text-[clamp(60px,8vw,100px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-6">
-            {event.title || "Untitled Event"}
-          </h1>
-          <div className="flex items-center gap-4 mb-8">
-            <img src={ieeeSmallBlueIcon} alt="IEEE" className="w-12 h-12 md:w-16 md:h-16" />
-            <p className="text-white text-[clamp(18px,2.5vw,30px)] font-inter font-semibold">
-              {formatDateTime(event.startsAt)}
-            </p>
-          </div>
-          {event.registrationLink && (
-            <div className="mb-8">
-              <Button asChild className="bg-ieee-blue hover:bg-ieee-blue/90 text-white font-semibold text-lg px-8 py-6 h-auto rounded-md uppercase">
-                <a
-                  href={event.registrationLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Register Now
-                </a>
-              </Button>
-            </div>
-          )}
-        </div>
+    <article>
+      <BackLink to="/events">All events</BackLink>
 
-        {/* Description */}
-        <div className="max-w-7xl mb-16">
-          <h2 className="text-[clamp(40px,6vw,60px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-6">
-            about this event
-          </h2>
-          <p className="text-[clamp(18px,2.5vw,30px)] font-inter font-semibold leading-[1.2] text-white whitespace-pre-wrap">
-            {event.description}
-          </p>
-        </div>
-
-        {/* Gallery */}
-        {event.photos && event.photos.length > 0 && (
-          <div>
-            <h2 className="text-[clamp(40px,6vw,60px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-8">
-              gallery
-            </h2>
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {event.photos.map(p => (
-                <figure
-                  key={p.id}
-                  className="bg-black rounded-lg overflow-hidden border-2 border-white hover:border-ieee-blue transition-colors duration-300"
-                >
-                  {p.photoUrl && (
-                    <img
-                      src={p.photoUrl}
-                      alt={p.altText || "Event photo"}
-                      className="w-full h-64 object-cover"
-                    />
-                  )}
-                  {p.altText && (
-                    <figcaption className="text-white/80 text-sm font-inter p-3">
-                      {p.altText}
-                    </figcaption>
-                  )}
-                </figure>
-              ))}
-            </div>
-          </div>
+      <header>
+        <time dateTime={event.startsAt} className="text-sm font-medium text-hk-accent-fg">
+          {formatDateTime(event.startsAt)}
+        </time>
+        <h1 className="mt-2 max-w-3xl text-3xl font-semibold tracking-tight text-balance text-white sm:text-4xl">
+          {event.title || "Untitled event"}
+        </h1>
+        {event.registrationLink && (
+          <ButtonAnchor href={event.registrationLink} size="lg" className="mt-6 w-full sm:w-auto">
+            Register now
+            <ExternalIcon />
+          </ButtonAnchor>
         )}
-      </div>
-    </section>
+      </header>
+
+      {event.description && (
+        <p className="mt-8 max-w-prose text-base leading-relaxed whitespace-pre-line text-zinc-300">
+          {event.description}
+        </p>
+      )}
+
+      {photos.length > 0 && (
+        <section aria-labelledby="gallery-title" className="mt-12 border-t border-white/10 pt-12">
+          <h2 id="gallery-title" className="text-2xl font-semibold text-white sm:text-3xl">
+            Gallery
+          </h2>
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {photos.map((photo) => (
+              <GalleryPhoto key={photo.id} photo={photo} />
+            ))}
+          </ul>
+        </section>
+      )}
+    </article>
   );
-};
+}

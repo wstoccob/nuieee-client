@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils";
 import { ArrowLeftIcon } from "./ui/icons";
 import { focusRing } from "./ui/styles";
 
-export function PublicShell({ children }: { children: ReactNode }) {
+const SHELL_WIDTHS = { narrow: "max-w-3xl", wide: "max-w-6xl" };
+
+export function PublicShell({ size = "narrow", children }: { size?: keyof typeof SHELL_WIDTHS; children: ReactNode }) {
   return (
     <MainLayout>
-      <div className="hk-root mx-auto w-full max-w-3xl">{children}</div>
+      <div className={cn("hk-root mx-auto w-full", SHELL_WIDTHS[size])}>{children}</div>
     </MainLayout>
   );
 }
@@ -18,7 +20,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-black">
       <AdminHeader />
-      <div className="hk-root mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">{children}</div>
+      <main className="hk-root mx-auto w-full max-w-6xl animate-page-in px-4 py-8 motion-reduce:animate-none sm:px-6 sm:py-12">
+        {children}
+      </main>
     </div>
   );
 }

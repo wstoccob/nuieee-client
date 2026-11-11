@@ -6,7 +6,9 @@ export const MainLayout = ({ children }: { children: ReactNode }) => {
     return (
         <div className="min-h-screen flex flex-col w-full">
             <Header/>
-            <main className="flex-grow w-full max-w-full px-6 py-12">{children}</main>
+            <main className="flex-grow w-full max-w-full overflow-x-clip px-6 py-12 animate-page-in motion-reduce:animate-none">
+                {children}
+            </main>
             <Footer />
         </div>
     );

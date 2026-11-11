@@ -3,10 +3,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import AdminHeader from "@/components/Layouts/AdminPageLayout/AdminHeader";
-import { Button } from "@/components/ui/button";
-import { EventFormField, fieldClassName } from "@/components/AddEvent/EventFormField";
 import { PhotoDropzone } from "@/components/AddEvent/PhotoDropzone";
+import { AdminShell, BackLink, PageHeader } from "@/components/hackathon/Shells";
+import { Button } from "@/components/hackathon/ui/Button";
+import { Card } from "@/components/hackathon/ui/Card";
+import { Field, Input, Textarea } from "@/components/hackathon/ui/form";
 import { usePhotoUploads } from "@/hooks/usePhotoUploads";
 import { useCreateEvent } from "@/hooks/useEvents";
 import { errorMessage } from "@/api/client";
@@ -60,54 +61,33 @@ export default function AddNewEventPage() {
   const { errors } = form.formState;
 
   return (
-    <div className="min-h-screen bg-black">
-      <AdminHeader />
-      <div className="container mx-auto px-4 py-16 lg:py-24">
-        <h1 className="text-[clamp(60px,8vw,100px)] font-inter font-extrabold text-ieee-blue lowercase leading-none mb-12">
-          add new event
-        </h1>
+    <AdminShell>
+      <BackLink to="/admin/events">All events</BackLink>
+      <PageHeader title="New event" description="It appears on the public Events page as soon as you create it." />
 
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="max-w-4xl space-y-8 bg-black border-2 border-[#555] rounded-lg shadow-2xl p-8 md:p-12"
-        >
-          <EventFormField label="Title" error={errors.title?.message}>
-            <input
-              type="text"
-              {...form.register("title")}
-              className={fieldClassName}
-              placeholder="Amazing Engineering Podcast"
-            />
-          </EventFormField>
+      <Card className="max-w-3xl">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <Field label="Title" error={errors.title?.message}>
+            {(control) => (
+              <Input {...control} type="text" placeholder="Amazing Engineering Podcast" {...form.register("title")} />
+            )}
+          </Field>
 
-          <EventFormField label="Event Date & Time" error={errors.startsAt?.message}>
-            <input
-              type="datetime-local"
-              {...form.register("startsAt")}
-              className={`${fieldClassName} [color-scheme:dark]`}
-            />
-          </EventFormField>
+          <Field label="Date and time" error={errors.startsAt?.message}>
+            {(control) => <Input {...control} type="datetime-local" {...form.register("startsAt")} />}
+          </Field>
 
-          <EventFormField
-            label="Registration Link (Optional)"
-            error={errors.registrationLink?.message}
-          >
-            <input
-              type="url"
-              {...form.register("registrationLink")}
-              className={fieldClassName}
-              placeholder="https://"
-            />
-          </EventFormField>
+          <Field label="Registration link" optional error={errors.registrationLink?.message}>
+            {(control) => (
+              <Input {...control} type="url" placeholder="https://" {...form.register("registrationLink")} />
+            )}
+          </Field>
 
-          <EventFormField label="Description" error={errors.description?.message}>
-            <textarea
-              rows={6}
-              {...form.register("description")}
-              className={fieldClassName}
-              placeholder="Describe the event..."
-            />
-          </EventFormField>
+          <Field label="Description" error={errors.description?.message}>
+            {(control) => (
+              <Textarea {...control} rows={6} placeholder="Describe the event…" {...form.register("description")} />
+            )}
+          </Field>
 
           <PhotoDropzone
             photos={uploads.photos}
@@ -118,30 +98,16 @@ export default function AddNewEventPage() {
             onAltTextChange={uploads.setAltText}
           />
 
-          <div className="flex gap-4">
-            <Button
-              type="submit"
-              disabled={busy}
-              className="bg-ieee-blue hover:bg-ieee-blue/90 text-white font-semibold text-lg px-8 py-6 h-auto rounded-md uppercase"
-            >
-              {uploads.uploading
-                ? "Uploading photos..."
-                : createEvent.isPending
-                  ? "Creating..."
-                  : "Create Event"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={busy}
-              onClick={() => navigate("/admin/events")}
-              className="border-[#555] text-black font-semibold text-lg px-8 py-6 h-auto rounded-md uppercase"
-            >
+          <div className="flex flex-col-reverse gap-2 border-t border-white/10 pt-5 sm:flex-row sm:justify-end">
+            <Button variant="secondary" disabled={busy} onClick={() => navigate("/admin/events")}>
               Cancel
+            </Button>
+            <Button type="submit" loading={busy}>
+              {uploads.uploading ? "Uploading photos…" : createEvent.isPending ? "Creating…" : "Create event"}
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </Card>
+    </AdminShell>
   );
 }
